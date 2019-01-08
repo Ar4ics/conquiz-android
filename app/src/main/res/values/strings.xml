@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Конквиз</string>
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="google_client_id">1080513381768-bo5sbcs0n4qm6802ge5b3qansqdcjmlv.apps.googleusercontent.com</string>
+    <string name="retry">Retry</string>
+    <string name="game_error">An error occurred while loading the games</string>
+</resources>
