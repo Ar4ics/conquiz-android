@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/main"
+            app:startDestination="@id/profile_page">
+    <fragment
+            android:id="@+id/profile_page"
+            android:name="com.gizmodev.conquiz.ui.profile.ProfileFragment"
+            android:label="fragment_profile_page"
+            tools:layout="@layout/fragment_profile_page">
+        <action
+                android:id="@+id/action_profile_page_to_login_page"
+                app:destination="@id/login_page" />
+    </fragment>
+    <fragment
+            android:id="@+id/login_page"
+            android:name="com.gizmodev.conquiz.ui.login.LoginFragment"
+            android:label="fragment_login_page"
+            tools:layout="@layout/fragment_login_page">
+        <action
+                android:id="@+id/action_login_page_to_list_games"
+                app:destination="@id/list_games" />
+    </fragment>
+    <fragment
+            android:id="@+id/list_games"
+            android:name="com.gizmodev.conquiz.ui.games.GameListFragment"
+            android:label="fragment_list_games"
+            tools:layout="@layout/fragment_list_games">
+        <action
+                android:id="@+id/action_list_games_to_view_game"
+                app:destination="@id/view_game" />
+    </fragment>
+    <fragment
+            android:id="@+id/view_game"
+            android:name="com.gizmodev.conquiz.ui.game.GameFragment"
+            android:label="fragment_view_game"
+            tools:layout="@layout/fragment_view_game" >
+        <argument
+                android:name="game"
+                app:argType="com.gizmodev.conquiz.model.Game" />
+    </fragment>
+</navigation>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".ui.login.LoginFragment">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+                name="state"
+                type="com.gizmodev.conquiz.ui.login.LoginViewModel.State" />
+
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:padding="16dp">
+        <TextView
+                android:text="@{state.errorMessage}"
+                android:visibility="@{state.error ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"
+                tools:text="error found"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="@+id/sign_in_button"
+                app:layout_constraintStart_toStartOf="@+id/sign_in_button"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toTopOf="@+id/sign_in_button"/>
+        <com.google.android.gms.common.SignInButton
+                android:id="@+id/sign_in_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        <ProgressBar
+                app:layout_constraintTop_toBottomOf="@id/sign_in_button"
+                android:id="@+id/progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="@{state.signing ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"
+                app:layout_constraintEnd_toEndOf="@+id/sign_in_button"
+                app:layout_constraintStart_toStartOf="@+id/sign_in_button"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

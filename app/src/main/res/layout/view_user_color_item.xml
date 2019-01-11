@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View" />
+        <import type="com.gizmodev.conquiz.utils.ColorPicker" />
+        <import type="com.gizmodev.conquiz.utils.DataBindingExtensions" />
+
+        <variable
+                name="user_color"
+                type="com.gizmodev.conquiz.model.UserColor" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <LinearLayout
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:orientation="horizontal"
+                tools:background="#ffeecc"
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+            <TextView
+                    android:padding="8dp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="start|center_vertical"
+                    android:text="@{user_color.user.name}"
+                    android:layout_weight="0.8"
+                    tools:text="username" />
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.1"
+                    android:gravity="center"
+                    android:text="@{DataBindingExtensions.getUserPlace(user_color)}"
+                    tools:text="1 место"/>
+            <TextView
+                    app:background="@{ColorPicker.pick(user_color.color)}"
+                    android:gravity="center"
+                    android:layout_weight="0.1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@{String.valueOf(user_color.score)}"
+                    tools:text="1000"/>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

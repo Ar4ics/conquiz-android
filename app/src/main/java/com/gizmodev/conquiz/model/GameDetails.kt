@@ -2,7 +2,7 @@ package com.gizmodev.conquiz.model
 
 data class GameDetails(
     val game: Game,
-    val field: Any,
+    val field: List<List<Box>>,
     val user_colors: List<UserColor>,
     val player: UserColor?,
     val who_moves: UserColor?,

@@ -1,0 +1,62 @@
+<layout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".ui.games.GameListFragment">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+                name="listener"
+                type="com.gizmodev.conquiz.ui.games.GameListFragment" />
+
+        <variable
+                name="state"
+                type="com.gizmodev.conquiz.ui.games.GameListViewModel.State" />
+
+        <variable
+                name="gamesbinding"
+                type="me.tatarka.bindingcollectionadapter2.ItemBinding" />
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:padding="16dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/games"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{(state.games.isEmpty() || state.loading) ? View.GONE : View.VISIBLE }"
+                app:itemBinding="@{gamesbinding}"
+                app:items="@{state.games}"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/view_game_item" />
+
+        <TextView
+                android:id="@+id/empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="@string/games_list_empty"
+                android:textSize="16sp"
+                android:visibility="@{(state.games.isEmpty() &amp;&amp; !state.loading) ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible" />
+
+        <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="@{state.loading ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

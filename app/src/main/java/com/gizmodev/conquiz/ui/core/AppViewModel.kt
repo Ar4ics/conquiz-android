@@ -15,5 +15,4 @@ abstract class AppViewModel : ViewModel() {
 
     fun Disposable.untilCleared() =
         disposeOnClear.add(this)
-
 }

@@ -13,6 +13,15 @@
         completions."
     </string>
     <string name="google_client_id">1080513381768-bo5sbcs0n4qm6802ge5b3qansqdcjmlv.apps.googleusercontent.com</string>
+    <string name="pusher_cluster">eu</string>
+    <string name="pusher_key">2e51ca3bb13d5c649395</string>
+    <string name="pusher_auth_endpoint">broadcasting/auth</string>
     <string name="retry">Retry</string>
     <string name="game_error">An error occurred while loading the games</string>
+    <string name="games_list_empty">Нет игр</string>
+    <string name="login_error">Ошибка входа</string>
+    <string name="sign_in">Войти</string>
+    <string name="sign_out">Выйти</string>
+    <string name="nav_profile">Профиль</string>
+    <string name="nav_games">Игры</string>
 </resources>

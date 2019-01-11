@@ -1,10 +1,8 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
-
 apply plugin: 'kotlin-kapt'
+apply plugin: "androidx.navigation.safeargs"
 
 android {
     signingConfigs {
@@ -18,14 +16,16 @@ android {
     dataBinding {
         enabled = true
     }
-    compileSdkVersion 28
+    compileSdkVersion rootProject.ext.versions.sdk.compile
     defaultConfig {
         applicationId "com.gizmodev.conquiz"
-        minSdkVersion 15
+        minSdkVersion "$versions.sdk.min"
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary true
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -41,60 +41,82 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    packagingOptions {
+        exclude "META-INF/DEPENDENCIES.txt"
+        exclude "META-INF/LICENSE.txt"
+        exclude "META-INF/NOTICE.txt"
+        exclude "META-INF/NOTICE"
+        exclude "META-INF/LICENSE"
+        exclude "META-INF/DEPENDENCIES"
+        exclude "META-INF/notice.txt"
+        exclude "META-INF/license.txt"
+        exclude "META-INF/MANIFEST.MF"
+        exclude "META-INF/dependencies.txt"
+        exclude "META-INF/LGPL2.1"
+        exclude "LICENSE.txt"
+        exclude ".readme"
+    }
+}
+
+androidExtensions {
+    experimental true
+}
+
+configurations {
+    all*.exclude group: "com.android.support"
 }
 
 dependencies {
-    ext {
-        retrofit_version = '2.5.0'
-        okhttp_version = '3.12.0'
-        rxjava_version = '2.2.5'
-        butterknife_version = '10.0.0'
-        dagger2_version = '2.16'
-    }
-
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0-alpha01'
-    implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
-    implementation 'androidx.browser:browser:1.0.0'
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.core:core:1.1.0-alpha03'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.legacy:legacy-support-core-utils:1.0.0'
-    implementation 'androidx.legacy:legacy-support-core-ui:1.0.0'
-    implementation 'androidx.fragment:fragment:1.1.0-alpha03'
-    implementation 'androidx.media:media:1.1.0-alpha01'
-    implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha01'
-    implementation 'com.google.android.material:material:1.1.0-alpha02'
-    implementation 'androidx.legacy:legacy-support-v13:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha01'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
+
+    implementation "androidx.core:core-ktx:$versions.ktx"
+    implementation "androidx.appcompat:appcompat:$versions.appcompat"
+    implementation "com.google.android.material:material:$versions.material"
+    implementation "androidx.constraintlayout:constraintlayout:$versions.constraint"
+
+    implementation "android.arch.navigation:navigation-fragment-ktx:$versions.navigation"
+    implementation "android.arch.navigation:navigation-ui-ktx:$versions.navigation"
+
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycle"
+    implementation "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle"
+    kapt "androidx.lifecycle:lifecycle-compiler:$versions.lifecycle"
+
+    implementation "com.jakewharton.timber:timber:$versions.timber"
+
+    implementation "io.reactivex.rxjava2:rxjava:$versions.rxjava"
+    implementation "io.reactivex.rxjava2:rxandroid:$versions.rxandroid"
+    implementation "io.reactivex.rxjava2:rxkotlin:$versions.rxkotlin"
+
+    implementation "com.squareup.retrofit2:retrofit:$versions.retrofit"
+    implementation "com.squareup.retrofit2:converter-moshi:$versions.retrofit"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit"
+
+    implementation "com.squareup.okhttp3:okhttp:$versions.okhttp"
+    implementation "com.squareup.okhttp3:logging-interceptor:$versions.okhttp"
+
+    implementation "com.google.dagger:dagger:$versions.dagger"
+    kapt "com.google.dagger:dagger-compiler:$versions.dagger"
+    implementation "com.google.dagger:dagger-android:$versions.dagger"
+    implementation "com.google.dagger:dagger-android-support:$versions.dagger"
+    kapt "com.google.dagger:dagger-android-processor:$versions.dagger"
+
+    implementation "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter:$versions.bindadapters"
+    implementation "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter-recyclerview:$versions.bindadapters"
+
+    implementation "com.google.android.gms:play-services-auth:$versions.playauth"
+
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$versions.leakcanary"
+    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$versions.leakcanary"
+    debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:$versions.leakcanary"
+
+    testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
-    implementation 'com.google.android.gms:play-services-auth:16.0.1'
+    implementation 'com.android.support:multidex:1.0.3'
 
-    implementation "com.jakewharton:butterknife:${butterknife_version}"
-    annotationProcessor "com.jakewharton:butterknife-compiler:${butterknife_version}"
+    implementation 'com.pusher:pusher-java-client:1.8.0'
 
-    implementation "com.squareup.retrofit2:retrofit:${retrofit_version}"
-    implementation "com.squareup.retrofit2:converter-moshi:${retrofit_version}"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:${retrofit_version}"
-
-    implementation "com.squareup.okhttp3:okhttp:${okhttp_version}"
-    implementation "com.squareup.okhttp3:logging-interceptor:${okhttp_version}"
-
-    implementation "io.reactivex.rxjava2:rxjava:${rxjava_version}"
-    implementation "io.reactivex.rxjava2:rxandroid:2.1.0"
-
-    implementation "com.google.dagger:dagger:${dagger2_version}"
-    implementation "com.google.dagger:dagger-android:${dagger2_version}"
-    implementation "com.google.dagger:dagger-android-support:${dagger2_version}"
-    kapt "com.google.dagger:dagger-compiler:${dagger2_version}"
-    kapt "com.google.dagger:dagger-android-processor:${dagger2_version}"
-
-    implementation 'com.jakewharton.timber:timber:4.7.1'
-
-    testImplementation 'junit:junit:4.12'
 }
