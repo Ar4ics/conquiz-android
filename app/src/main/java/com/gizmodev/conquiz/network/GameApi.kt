@@ -2,16 +2,17 @@ package com.gizmodev.conquiz.network
 
 import com.gizmodev.conquiz.model.GameDetails
 import com.gizmodev.conquiz.model.GamesInfo
-import io.reactivex.Observable
+import io.reactivex.Single
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
 interface GameApi {
     @GET("games")
-    fun getGames(): Observable<GamesInfo>
+    fun getGames(): Single<GamesInfo>
 
     @GET("games/{id}")
-    fun getGame(@Path(value = "id", encoded = true) id: Int): Observable<GameDetails>
+    fun getGame(@Path(value = "id", encoded = true) id: Int): Single<GameDetails>
 
     @FormUrlEncoded
     @POST("games/{id}/base/box/clicked")
@@ -20,9 +21,14 @@ interface GameApi {
         @Field("x") x: Int,
         @Field("y") y: Int,
         @Field("userColorId") userColorId: Int
-    ): Observable<Response<Any>>
+    ): Single<Response<ResponseBody>>
 
     @FormUrlEncoded
     @POST("games/{id}/base/user/answered")
-    fun questionAnswer(@Path(value = "id", encoded = true) id: String): Observable<Response<Any>>
+    fun questionAnswer(
+        @Path(value = "id", encoded = true) id: Int,
+        @Field("userAnswer") userAnswer: Int,
+        @Field("questionId") questionId: Int,
+        @Field("userColorId") userColorId: Int
+    ): Single<Response<ResponseBody>>
 }

@@ -1,7 +1,7 @@
 package com.gizmodev.conquiz.network
 
 import com.gizmodev.conquiz.model.UserLogin
-import io.reactivex.Observable
+import io.reactivex.Single
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -13,14 +13,14 @@ interface LoginApi {
     @POST("auth/google")
     fun getToken(
         @Field("code") code: String
-    ): Observable<Response<Any>>
+    ): Single<Response<Any>>
 
     @GET("auth/refresh")
-    fun refreshToken(): Observable<Response<Any>>
+    fun refreshToken(): Single<Response<Any>>
 
     @GET("auth/user")
-    fun getUser(): Observable<UserLogin>
+    fun getUser(): Single<UserLogin>
 
     @POST("auth/logout")
-    fun logout(): Observable<Response<Any>>
+    fun logout(): Single<Response<Any>>
 }

@@ -1,4 +1,4 @@
-package com.gizmodev.conquiz.ui.game
+package com.gizmodev.conquiz.ui.question
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -13,36 +13,36 @@ import dagger.android.ContributesAndroidInjector
 import dagger.multibindings.IntoMap
 
 @Module(includes = [
-    GameModule.ProvideViewModel::class
+    QuestionModule.ProvideViewModel::class
 ])
-abstract class GameModule {
+abstract class QuestionModule {
 
     @ContributesAndroidInjector(modules = [
         InjectViewModel::class
     ])
-    abstract fun bind(): GameFragment
+    abstract fun bind(): QuestionFragment
 
     @Module
     class ProvideViewModel {
 
         @Provides
         @IntoMap
-        @ViewModelKey(GameViewModel::class)
-        fun provideProfileViewModel(
+        @ViewModelKey(QuestionViewModel::class)
+        fun provideQuestionViewModel(
             gameApi: GameApi,
             pusherHolder: PusherHolder,
             gameHolder: GameHolder
-        ): ViewModel = GameViewModel(gameApi, pusherHolder, gameHolder)
+        ): ViewModel = QuestionViewModel(gameApi, pusherHolder, gameHolder)
     }
 
     @Module
     class InjectViewModel {
 
         @Provides
-        fun provideProfileViewModel(
+        fun provideQuestionViewModel(
             factory: ViewModelProvider.Factory,
-            target: GameFragment
-        ) = ViewModelProviders.of(target, factory).get(GameViewModel::class.java)
+            target: QuestionFragment
+        ) = ViewModelProviders.of(target, factory).get(QuestionViewModel::class.java)
     }
 
 }

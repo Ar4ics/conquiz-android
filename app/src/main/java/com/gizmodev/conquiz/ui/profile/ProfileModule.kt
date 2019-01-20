@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.gizmodev.conquiz.network.AuthenticationInterceptor
+import com.gizmodev.conquiz.network.GameHolder
 import com.gizmodev.conquiz.network.LoginApi
+import com.gizmodev.conquiz.network.PusherHolder
 import com.gizmodev.conquiz.ui.core.ViewModelKey
 import com.gizmodev.conquiz.utils.SharedPrefStorage
 import dagger.Module
@@ -31,8 +33,10 @@ abstract class ProfileModule {
         fun provideProfileViewModel(
             loginApi: LoginApi,
             sharedPrefStorage: SharedPrefStorage,
-            authenticationInterceptor: AuthenticationInterceptor
-        ): ViewModel = ProfileViewModel(loginApi, sharedPrefStorage, authenticationInterceptor)
+            authenticationInterceptor: AuthenticationInterceptor,
+            gameHolder: GameHolder,
+            pusherHolder: PusherHolder
+        ): ViewModel = ProfileViewModel(loginApi, sharedPrefStorage, authenticationInterceptor, gameHolder, pusherHolder)
     }
 
     @Module

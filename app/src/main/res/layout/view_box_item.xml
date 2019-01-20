@@ -1,57 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
+        xmlns:tools="http://schemas.android.com/tools" android:id="@+id/layout2">
     <data>
-        <import type="android.view.View" />
-        <import type="com.gizmodev.conquiz.utils.ColorPicker" />
-        <import type="com.gizmodev.conquiz.utils.DataBindingExtensions" />
+        <import type="android.view.View"/>
+        <import type="com.gizmodev.conquiz.utils.ColorPicker"/>
 
         <variable
                 name="box"
-                type="com.gizmodev.conquiz.model.Box" />
+                type="com.gizmodev.conquiz.model.Box"/>
 
         <variable
                 name="listener"
-                type="com.gizmodev.conquiz.ui.game.OnBoxClickListener" />
+                type="com.gizmodev.conquiz.ui.game.OnBoxClickListener"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
+            android:padding="8dp"
+            app:background="@{ColorPicker.pick(box.color)}"
+            tools:background="#ffeecc"
             android:onClick="@{() -> listener.onBoxClicked(box)}">
-        <LinearLayout
-                android:padding="8dp"
+        <TextView
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:id="@+id/cost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{box.getBoxCost()}"
+                tools:text="200"
+                app:layout_constraintVertical_chainStyle="packed"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:orientation="vertical"
-                app:background="@{ColorPicker.pick(box.color)}"
-                tools:background="#ffeecc"
+                app:layout_constraintBottom_toTopOf="@id/base"/>
+        <TextView
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:id="@+id/base"
                 android:gravity="center"
                 android:layout_width="match_parent"
-                android:layout_height="100dp">
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{DataBindingExtensions.getBoxCost(box)}"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="200" />
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{DataBindingExtensions.getUserBase(box.base)}"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:visibility="@{box.base != null ? View.VISIBLE : View.GONE, default=gone }"
-                    tools:visibility="visible"
-                    tools:background="#ffeecc"
-                    tools:text="username &lt;3&gt;" />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                app:layout_constraintVertical_chainStyle="packed"
+                android:text="@{box.getUserBase()}"
+                android:visibility="@{box.base != null ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"
+                tools:background="#ffeecc"
+                tools:text="username &lt;3&gt;"
+                app:layout_constraintTop_toBottomOf="@+id/cost"
+                app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

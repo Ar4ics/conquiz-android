@@ -6,15 +6,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import com.gizmodev.conquiz.R
 import com.gizmodev.conquiz.databinding.FragmentLoginPageBinding
 import com.gizmodev.conquiz.ui.core.AppFragment
-import com.gizmodev.conquiz.ui.core.rx.toFlowable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
-import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -29,7 +28,7 @@ class LoginFragment : AppFragment() {
     private fun onLogin() {
         val signInIntent = googleSignInClient.signInIntent
         startActivityForResult(signInIntent, RC_GET_AUTH_CODE)
-        vm.state.signing.set(true)
+        vm.state.setSigningIn()
     }
 
     companion object {
@@ -59,6 +58,7 @@ class LoginFragment : AppFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentLoginPageBinding.inflate(inflater, container, false)
             .apply {
+                setLifecycleOwner(this@LoginFragment)
                 state = this@LoginFragment.vm.state
                 executePendingBindings()
             }
@@ -66,14 +66,12 @@ class LoginFragment : AppFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Timber.d("view created")
-        vm.state.signed.toFlowable()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                Timber.d("signed=$it")
-                navController().navigate(LoginFragmentDirections.actionLoginPageToListGames())
-            }
-            .untilDestroyView()
+        vm.state.sign.observe(this, Observer {
+                Timber.d("sign=$it")
+                if (it.success()) {
+                    navController().navigate(LoginFragmentDirections.actionLoginPageToProfilePage())
+                }
+            })
         view.findViewById<SignInButton>(R.id.sign_in_button).setOnClickListener { onLogin() }
     }
 

@@ -12,7 +12,8 @@ import javax.inject.Singleton
     NetworkModule::class,
     AppModule::class,
     AndroidSupportInjectionModule::class,
-    UiModule::class
+    UiModule::class,
+    AuthModule::class
 ])
 @Singleton
 interface AppComponent {

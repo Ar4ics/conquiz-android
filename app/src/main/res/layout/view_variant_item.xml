@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+        <import type="com.gizmodev.conquiz.utils.ColorPicker"/>
+        <import type="android.graphics.Color"/>
+
+        <variable
+                name="variant"
+                type="com.gizmodev.conquiz.model.AnswerVariant"/>
+
+        <variable
+                name="listener"
+                type="com.gizmodev.conquiz.ui.question.OnVariantClickListener"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:gravity="center"
+            android:background="@{variant.getColor()}"
+            android:onClick="@{() -> listener.onVariantClick(variant)}">
+        <TextView
+                android:id="@+id/title"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintBottom_toTopOf="@id/results"
+                android:text="@{variant.title}"
+                tools:text="some answer to question"/>
+        <TextView
+                android:id="@+id/results"
+                app:layout_constraintTop_toBottomOf="@id/title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{variant.getPlayers()}"
+                android:visibility="@{variant.isResultsExists() ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"
+                tools:text="(1, 1)"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

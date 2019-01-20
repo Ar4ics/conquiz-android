@@ -5,109 +5,135 @@
         tools:context=".ui.game.GameFragment">
 
     <data>
-        <import type="android.view.View" />
-        <import type="com.gizmodev.conquiz.utils.DataBindingExtensions" />
+        <import type="android.view.View"/>
 
         <variable
                 name="listener"
-                type="com.gizmodev.conquiz.ui.game.GameFragment" />
+                type="com.gizmodev.conquiz.ui.game.GameFragment"/>
 
         <variable
                 name="state"
-                type="com.gizmodev.conquiz.ui.game.GameViewModel.State" />
+                type="com.gizmodev.conquiz.ui.game.GameViewModel.State"/>
 
         <variable
                 name="boxesbinding"
-                type="me.tatarka.bindingcollectionadapter2.ItemBinding" />
+                type="me.tatarka.bindingcollectionadapter2.ItemBinding"/>
 
         <variable
                 name="usercolorsbinding"
-                type="me.tatarka.bindingcollectionadapter2.ItemBinding" />
+                type="me.tatarka.bindingcollectionadapter2.ItemBinding"/>
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="16dp">
+    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent">
 
-        <TextView
-                android:id="@+id/game_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@{state.gameDetails.game.title}"
-                tools:text="Game №1"
-                android:textSize="20sp"
-                android:gravity="center"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/user_colors"
-                app:spanCount="3"
-                app:layout_constraintTop_toBottomOf="@id/game_title"
+        <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:itemBinding="@{usercolorsbinding}"
-                app:items="@{state.gameDetails.user_colors}"
-                tools:itemCount="3"
-                android:layout_marginBottom="8dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/view_user_color_item"
-                android:visibility="visible"/>
+                android:padding="16dp">
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/boxes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:itemBinding="@{boxesbinding}"
-                app:items="@{state.field}"
-                tools:spanCount="3"
-                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                tools:listitem="@layout/view_box_item" android:layout_marginTop="16dp"
-                android:visibility="visible"
-                app:layout_constraintTop_toBottomOf="@id/user_colors"/>
+            <TextView
+                    android:id="@+id/game_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@{state.gameDetails.data.game.title}"
+                    tools:text="Game №1"
+                    android:textSize="20sp"
+                    android:gravity="center"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
 
-        <TextView
-                android:id="@+id/who_moves"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:text="@{DataBindingExtensions.getMovingUser(state.gameDetails.who_moves)}"
-                android:visibility="@{DataBindingExtensions.movingUserIsVisible(state.gameDetails) ? View.VISIBLE : View.GONE, default=gone }"
-                tools:visibility="visible"
-                tools:text="Ходит username"
-                android:gravity="center"
-                android:layout_marginTop="8dp"
-                android:textSize="18sp"
-                app:layout_constraintTop_toBottomOf="@id/boxes"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/user_colors"
+                    app:layout_constraintTop_toBottomOf="@id/game_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:itemBinding="@{usercolorsbinding}"
+                    app:items="@{state.players}"
+                    tools:itemCount="3"
+                    android:layout_marginBottom="8dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/view_user_color_item"
+                    android:visibility="visible"/>
 
-        <TextView
-                android:id="@+id/winner"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:text="@{DataBindingExtensions.getWinner(state.gameDetails)}"
-                tools:text="Победитель username"
-                android:gravity="center"
-                android:layout_marginTop="8dp"
-                android:textSize="18sp"
-                app:layout_constraintTop_toBottomOf="@id/who_moves"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/boxes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:itemBinding="@{boxesbinding}"
+                    app:items="@{state.field}"
+                    tools:spanCount="3"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    tools:listitem="@layout/view_box_item"
+                    android:visibility="visible"
+                    app:layout_constraintTop_toBottomOf="@id/user_colors" tools:layout_editor_absoluteX="16dp"/>
 
-        <TextView
-                android:text="@{state.errorMessage}"
-                android:visibility="@{state.error ? View.VISIBLE : View.GONE, default=gone }"
-                tools:visibility="visible"
-                tools:text="error found"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/winner"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+            <ProgressBar
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:id="@+id/progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="@{state.gameDetails.loading() ? View.VISIBLE : View.GONE, default=gone }"
+                    tools:visibility="visible"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/open_question"
+                    android:text="@string/open_question"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:visibility="@{state.question != null ? View.VISIBLE : View.GONE, default=gone }"
+                    android:layout_height="wrap_content"
+                    tools:visibility="visible"
+                    app:layout_constraintTop_toBottomOf="@id/boxes"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+            <TextView
+                    android:id="@+id/who_moves"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="@{state.whoMovesName}"
+                    android:visibility="@{state.whoMovesNameIsVisible ? View.VISIBLE : View.GONE, default=gone }"
+                    tools:visibility="visible"
+                    tools:text="Ходит username"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:textSize="18sp"
+                    app:layout_constraintTop_toBottomOf="@id/open_question"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                    android:id="@+id/winner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="@{state.winnerName}"
+                    tools:text="Победитель username"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:textSize="18sp"
+                    app:layout_constraintTop_toBottomOf="@id/who_moves"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                    android:text="@{state.gameDetails.error()}"
+                    android:visibility="@{state.gameDetails.hasError() ? View.VISIBLE : View.GONE, default=gone }"
+                    tools:visibility="visible"
+                    tools:text="error found"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </layout>

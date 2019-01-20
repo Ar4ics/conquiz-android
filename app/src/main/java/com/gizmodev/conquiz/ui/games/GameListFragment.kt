@@ -13,20 +13,15 @@ import kotlinx.android.synthetic.main.fragment_list_games.*
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import javax.inject.Inject
 
-class GameListFragment : AppFragment(),
-    OnGameClickListener {
+class GameListFragment : AppFragment(), OnGameClickListener {
 
     @Inject
     lateinit var vm: GameListViewModel
 
-    override fun onStart() {
-        super.onStart()
-        vm.list()
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentListGamesBinding.inflate(inflater, container, false)
             .apply {
+                setLifecycleOwner(this@GameListFragment)
                 listener = this@GameListFragment
                 state = this@GameListFragment.vm.state
                 gamesbinding = ItemBinding

@@ -24,4 +24,13 @@
     <string name="sign_out">Выйти</string>
     <string name="nav_profile">Профиль</string>
     <string name="nav_games">Игры</string>
+    <string name="nav_login">Авторизация</string>
+    <string name="nav_game">Игровая комната</string>
+    <string name="nav_question">Вопрос</string>
+    <string name="sample_question">It will create a directory with a default name sampledata Inside it you can create
+        multiple raw files to use across your project.
+    </string>
+    <string name="open_question">Открыть вопрос</string>
+    <string name="input_exact_answer">Введите числовой ответ</string>
+    <string name="game_status">Завершена</string>
 </resources>

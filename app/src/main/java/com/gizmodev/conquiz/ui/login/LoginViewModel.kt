@@ -1,14 +1,17 @@
 package com.gizmodev.conquiz.ui.login
 
-import androidx.databinding.ObservableBoolean
-import androidx.databinding.ObservableField
+import androidx.lifecycle.MutableLiveData
 import com.gizmodev.conquiz.network.AuthenticationInterceptor
 import com.gizmodev.conquiz.network.LoginApi
+import com.gizmodev.conquiz.network.Result
 import com.gizmodev.conquiz.ui.core.AppViewModel
 import com.gizmodev.conquiz.utils.SharedPrefStorage
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import retrofit2.Response
 import timber.log.Timber
 
@@ -23,17 +26,13 @@ class LoginViewModel (
     fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
         try {
             val account = completedTask.getResult(ApiException::class.java)
-
-            // Signed in successfully, show authenticated UI.
             account?.serverAuthCode?.let {
                 authenticate(it)
             }
         } catch (error: Exception) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Timber.e("failed getting code: ${error.localizedMessage}")
             sharedPrefStorage.removeToken()
-            state.setError(error)
+            state.setSignedOut(error)
         }
 
     }
@@ -41,7 +40,18 @@ class LoginViewModel (
 
     private fun authenticate(googleAuthCode: String) {
 
-        loginApi.getToken(googleAuthCode).subscribe(
+//        launch {
+//            try {
+//                val data = loginApi.getToken(googleAuthCode).await()
+//                onSuccess(data)
+//            } catch (e: Exception) {
+//                onError(e)
+//            }
+//        }
+        loginApi.getToken(googleAuthCode)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
             { result -> onSuccess(result) },
             { error -> onError(error) }
         ).untilCleared()
@@ -53,36 +63,63 @@ class LoginViewModel (
         val token = headers.get("Authorization")
         Timber.d("success token = $token")
         if (token != null && response.isSuccessful) {
-            sharedPrefStorage.writeToken(token)
             authenticationInterceptor.token = token;
-            state.setSuccess()
+            writeToken(token)
         } else {
-            state.setError(Throwable("error logging"))
+            state.setSignedOut(Throwable("token or response is null"))
         }
+    }
+
+    private fun writeToken(token: String) {
+        Observable.defer {
+            val success = sharedPrefStorage.writeToken(token)
+            Observable.just(success)
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { result ->
+                    if (result) {
+                        state.setSignedIn(token)
+                    } else {
+                        state.setSignedOut(Throwable("token cannot be written"))
+                    }
+                },
+                { error ->
+                    Timber.e("Failed to write token: ${error.localizedMessage}")
+                    state.setSignedOut(error)
+                }
+            )
+            .untilCleared()
     }
 
     private fun onError(error: Throwable) {
         Timber.e("error getting token = ${error.localizedMessage}")
-        sharedPrefStorage.removeToken()
-        state.setError(error)
+        state.setSignedOut(error)
     }
 
     class State {
-        val error = ObservableBoolean()
-        val errorMessage = ObservableField<String>()
-        val signing = ObservableBoolean()
-        val signed = ObservableBoolean()
+        val sign = MutableLiveData<Result<String>>()
 
-        fun setSuccess() {
-            signing.set(false)
-            signed.set(true)
+        fun setSignedOut(throwable: Throwable) {
+            sign.value = Result(
+                Result.Status.COMPLETED,
+                null,
+                throwable
+            )
         }
 
-        fun setError(e: Throwable) {
-            signing.set(false)
-            signed.set(false)
-            error.set(true)
-            errorMessage.set(e.localizedMessage)
+        fun setSigningIn() {
+            sign.value =
+                    Result(Result.Status.LOADING, null, null)
+        }
+
+        fun setSignedIn(token: String) {
+            sign.value = Result(
+                Result.Status.COMPLETED,
+                token,
+                null
+            )
         }
     }
 

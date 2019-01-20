@@ -3,51 +3,50 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <import type="android.view.View" />
-        <import type="com.gizmodev.conquiz.utils.ColorPicker" />
-        <import type="com.gizmodev.conquiz.utils.DataBindingExtensions" />
+        <import type="android.view.View"/>
+        <import type="com.gizmodev.conquiz.utils.ColorPicker"/>
 
         <variable
                 name="user_color"
-                type="com.gizmodev.conquiz.model.UserColor" />
+                type="com.gizmodev.conquiz.model.UserColor"/>
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+            tools:background="#ffeecc"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <LinearLayout
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:orientation="horizontal"
-                tools:background="#ffeecc"
-                android:layout_width="match_parent"
-                android:layout_height="50dp">
-            <TextView
-                    android:padding="8dp"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="start|center_vertical"
-                    android:text="@{user_color.user.name}"
-                    android:layout_weight="0.8"
-                    tools:text="username" />
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.1"
-                    android:gravity="center"
-                    android:text="@{DataBindingExtensions.getUserPlace(user_color)}"
-                    tools:text="1 место"/>
-            <TextView
-                    app:background="@{ColorPicker.pick(user_color.color)}"
-                    android:gravity="center"
-                    android:layout_weight="0.1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="@{String.valueOf(user_color.score)}"
-                    tools:text="1000"/>
-        </LinearLayout>
+            android:layout_height="50dp">
+        <TextView
+                android:padding="8dp"
+                android:id="@+id/username"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/place"
+                app:layout_constraintEnd_toStartOf="@id/place"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="start|center_vertical"
+                android:text="@{user_color.user.name}"
+                tools:text="username"/>
+        <TextView
+                android:padding="8dp"
+                android:id="@+id/place"
+                app:layout_constraintRight_toLeftOf="@id/score"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@{user_color.getUserPlace()}"
+                tools:text="1 место"/>
+        <TextView
+                android:padding="8dp"
+                android:id="@+id/score"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:background="@{ColorPicker.pick(user_color.color)}"
+                android:gravity="center"
+                android:layout_gravity="end"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="@{String.valueOf(user_color.score)}"
+                tools:text="1000"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </layout>

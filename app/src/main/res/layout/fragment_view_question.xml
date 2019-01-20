@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".ui.question.QuestionFragment">
+
+    <data>
+        <import type="android.view.View" />
+
+        <variable
+                name="listener"
+                type="com.gizmodev.conquiz.ui.question.QuestionFragment" />
+
+        <variable
+                name="state"
+                type="com.gizmodev.conquiz.ui.question.QuestionViewModel.State" />
+
+        <variable
+                name="variantsbinding"
+                type="me.tatarka.bindingcollectionadapter2.ItemBinding" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+        <TextView
+
+                android:id="@+id/question_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{state.question.title}"
+                android:textSize="20sp"
+                tools:text="@string/sample_question"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/variants"
+        />
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/variants"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:itemBinding="@{variantsbinding}"
+                app:items="@{state.question.answers}"
+                tools:itemCount="4"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/view_variant_item"
+                app:layout_constraintTop_toBottomOf="@id/question_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="@{state.question.answers != null ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"/>
+
+        <com.google.android.material.textfield.TextInputEditText
+                android:gravity="center"
+                android:id="@+id/exact_answer"
+                android:singleLine="true"
+                android:layout_width="match_parent"
+                android:hint="@string/input_exact_answer"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/variants"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="@{state.question.answers == null ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"
+        />
+
+        <TextView
+                android:text="@{state.gameQuestion.error()}"
+                android:visibility="@{state.gameQuestion.hasError() ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"
+                android:gravity="center"
+                tools:text="error found"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/exact_answer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+        />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

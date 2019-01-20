@@ -13,24 +13,62 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+            android:padding="8dp"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="wrap_content"
             android:onClick="@{() -> listener.onGameClicked(game)}">
 
+        <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/status"
+                android:layout_width="wrap_content"
+                android:checked="@{game.isFinished()}"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
         <TextView
-                android:id="@+id/text"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:gravity="start|center_vertical"
                 android:maxLines="2"
-                android:padding="8dp"
+                android:textSize="20sp"
                 android:text="@{game.title}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/players"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="@tools:sample/lorem/random" />
+                app:layout_constraintEnd_toEndOf="parent"
+
+                tools:text="Игра 1" />
+
+        <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="2"
+                android:text="@{game.date}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:text="Дата" />
+
+        <TextView
+                android:id="@+id/players"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="2"
+                android:gravity="center"
+                android:text="@{game.players()}"
+                app:layout_constraintTop_toBottomOf="@id/title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:text="Игроки" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

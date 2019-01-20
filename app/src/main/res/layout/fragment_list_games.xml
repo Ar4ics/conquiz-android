@@ -21,42 +21,50 @@
                 type="me.tatarka.bindingcollectionadapter2.ItemBinding" />
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/white"
             android:padding="16dp">
 
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/games"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="@{(state.games.isEmpty() || state.loading) ? View.GONE : View.VISIBLE }"
+                android:visibility="@{state.games.success() ? View.VISIBLE : View.GONE, default=gone }"
                 app:itemBinding="@{gamesbinding}"
-                app:items="@{state.games}"
+                app:items="@{state.games.data}"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/view_game_item" />
 
         <TextView
-                android:id="@+id/empty"
+                android:text="@{state.games.error()}"
+                android:visibility="@{state.games.hasError() ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"
+                tools:text="error found"
+                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:gravity="center"
-                android:padding="16dp"
-                android:text="@string/games_list_empty"
-                android:textSize="16sp"
-                android:visibility="@{(state.games.isEmpty() &amp;&amp; !state.loading) ? View.VISIBLE : View.GONE, default=gone }"
-                tools:visibility="visible" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
         <ProgressBar
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 android:id="@+id/progress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:visibility="@{state.loading ? View.VISIBLE : View.GONE, default=gone }"
+                android:visibility="@{state.games.loading() ? View.VISIBLE : View.GONE, default=gone }"
                 tools:visibility="visible" />
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

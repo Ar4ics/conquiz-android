@@ -7,11 +7,12 @@ object ColorPicker {
 
     @ColorInt
     @JvmStatic
-    fun pick(color: String): Int =
+    fun pick(color: String?): Int =
         when (color) {
             "LightPink" -> Color.RED
             "LightGreen" -> Color.GREEN
             "LightBlue" -> Color.BLUE
+            null -> Color.WHITE
             else -> {
                 try {
                     Color.parseColor(color)

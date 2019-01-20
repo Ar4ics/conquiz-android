@@ -17,11 +17,10 @@
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/white"
             android:padding="16dp">
         <TextView
-                android:text="@{state.errorMessage}"
-                android:visibility="@{state.error ? View.VISIBLE : View.GONE, default=gone }"
+                android:text="@{state.sign.error()}"
+                android:visibility="@{state.sign.hasError() ? View.VISIBLE : View.GONE, default=gone }"
                 tools:visibility="visible"
                 tools:text="error found"
                 android:layout_width="wrap_content"
@@ -44,7 +43,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:visibility="@{state.signing ? View.VISIBLE : View.GONE, default=gone }"
+                android:visibility="@{state.sign.loading() ? View.VISIBLE : View.GONE, default=gone }"
                 tools:visibility="visible"
                 app:layout_constraintEnd_toEndOf="@+id/sign_in_button"
                 app:layout_constraintStart_toStartOf="@+id/sign_in_button"/>
