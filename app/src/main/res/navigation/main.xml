@@ -3,7 +3,7 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/main"
-            app:startDestination="@id/list_games">
+            app:startDestination="@id/profile_page">
     <fragment
             android:id="@+id/profile_page"
             android:name="com.gizmodev.conquiz.ui.profile.ProfileFragment"
@@ -12,6 +12,9 @@
         <action
                 android:id="@+id/action_profile_page_to_login_page"
                 app:destination="@id/login_page" />
+        <action
+                android:id="@+id/action_profile_page_to_list_games"
+                app:destination="@id/list_games" />
     </fragment>
     <fragment
             android:id="@+id/login_page"

@@ -90,16 +90,18 @@ class GameFragment : AppFragment(), OnBoxClickListener {
         vm.state.question.observe(this, Observer {
             Timber.d("question=$it")
             if (it != null) {
-                showDialog(it)
+                if (!it.is_exact_answer) {
+                    showDialog(it)
+                }
             } else {
                 hideDialog()
             }
         })
 
-        vm.state.showExactQuestion.observe(this, Observer {
+        vm.state.exactQuestion.observe(this, Observer {
             Timber.d("exactQuestion=$it")
             if (it) {
-                val q = vm.state.exactQuestion.value
+                val q = vm.state.question.value
                 if (q != null) {
                     showDialog(q)
                 }

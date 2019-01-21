@@ -49,6 +49,7 @@ class GameViewModel(
 
 
     private fun onRetrieveGameSuccess(gameDetails: GameDetails) {
+        Timber.d("success load game: $gameDetails")
         gameHolder.player = gameDetails.player
         gameHolder.question = gameDetails.question
         state.setGame(gameDetails)
@@ -143,11 +144,12 @@ class GameViewModel(
                             if (correctAnswers != null) {
                                 state.answerResults.postValue(AnswerResults(correctAnswers.results, correctAnswers.correct, listOf()))
                                 Timber.d("start delay: ${DateTimePicker.getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss")}")
+                                state.showExactQuestion.postValue(false)
                                 Completable
                                     .timer(3, TimeUnit.SECONDS)
                                     .subscribeBy(
                                         onComplete = {
-                                            state.setQuestion(null)
+                                            state.showExactQuestion.postValue(true)
                                             Timber.d("complete delay: ${DateTimePicker.getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss")}")
                                         },
                                         onError = {
@@ -169,7 +171,6 @@ class GameViewModel(
                                     .timer(3, TimeUnit.SECONDS)
                                     .subscribeBy(
                                         onComplete = {
-                                            state.setExactQuestion(null)
                                             state.setQuestion(null)
                                             Timber.d("complete delay: ${DateTimePicker.getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss")}")
                                         },
@@ -191,29 +192,19 @@ class GameViewModel(
                             }
                         }
                         PusherHolder.WhoAttack -> {
-                            val whoAttack = Result.fromJson<CompetitiveBox>(data)
+                            val whoAttack = Result.fromJson<WhoAttack>(data)
                             Timber.d("whoAttack: $whoAttack")
                             if (whoAttack != null) {
-                                state.setCompetitiveBox(whoAttack)
+                                state.setCompetitiveBox(whoAttack.competitive_box)
                             } else {
                                 pusherHolder.errorParsingJson()
                             }
                         }
-                        PusherHolder.NewQuestion -> {
+                        PusherHolder.NewQuestion, PusherHolder.NewExactQuestion -> {
                             val question = Result.fromJson<Question>(data)
                             Timber.d("question: $question")
                             if (question != null) {
                                 state.setQuestion(question)
-                                gameHolder.question = question
-                            } else {
-                                pusherHolder.errorParsingJson()
-                            }
-                        }
-                        PusherHolder.NewExactQuestion -> {
-                            val question = Result.fromJson<Question>(data)
-                            Timber.d("exact question: $question")
-                            if (question != null) {
-                                state.setExactQuestion(question)
                                 gameHolder.question = question
                             } else {
                                 pusherHolder.errorParsingJson()
@@ -262,11 +253,17 @@ class GameViewModel(
         val field = MutableLiveData<List<Box>>()
         val players = MutableLiveData<List<UserColor>>()
         val question = MutableLiveData<Question?>()
-        val exactQuestion = MutableLiveData<Question?>()
         val whoMoves = MutableLiveData<UserColor?>()
         val winner = MutableLiveData<UserColor?>()
         val answerResults = MutableLiveData<AnswerResults>()
         val competitiveAnswerResults = MutableLiveData<CompetitiveAnswerResults>()
+
+        val showExactQuestion = MutableLiveData<Boolean>()
+        val exactQuestion = Transformations.map(DoubleTrigger(question, showExactQuestion)) {
+            val q = it.first
+            val showExactQuestion = it.second
+            q != null && q.is_exact_answer && (showExactQuestion != null && showExactQuestion || showExactQuestion == null)
+        }
 
         val whoMovesName = Transformations.map(whoMoves) {
             if (it != null) {
@@ -274,14 +271,6 @@ class GameViewModel(
             } else {
                 ""
             }
-        }
-
-        val whoMovesNameIsVisible: LiveData<Boolean> = Transformations.map(DoubleTrigger(whoMoves, winner)) {
-            it.first != null && it.second == null
-        }
-
-        val showExactQuestion: LiveData<Boolean> = Transformations.map(DoubleTrigger(exactQuestion, question)) {
-            it.first != null && it.second == null
         }
 
         val winnerName = Transformations.map(winner) {
@@ -298,14 +287,14 @@ class GameViewModel(
                 if (competitiveBox != null) {
                     val oldBox = oldField.find { it.x == competitiveBox.x && it.y == competitiveBox.y }
                     val oldBoxIndex = oldField.indexOfFirst { it.x == competitiveBox.x && it.y == competitiveBox.y }
-                    if (oldBoxIndex >= 0 && oldBox != null) {
+                    if (oldBoxIndex != -1 && oldBox != null) {
                         oldField[oldBoxIndex] = oldBox.copy(color = "gray")
+                        Timber.d("oldField: $oldField")
+                        field.postValue(oldField)
                     } else {
                         Timber.e("oldField error")
                     }
                 }
-                Timber.d("oldField: $oldField")
-                field.postValue(oldField)
             }
         }
 
@@ -314,7 +303,7 @@ class GameViewModel(
             if (oldField != null) {
                 val oldBox = oldField.find { it.x == box.x && it.y == box.y }
                 val oldBoxIndex = oldField.indexOfFirst { it.x == box.x && it.y == box.y }
-                if (oldBoxIndex >= 0 && oldBox != null) {
+                if (oldBoxIndex != -1 && oldBox != null) {
                     oldField[oldBoxIndex] = box
                 } else {
                     Timber.e("oldField error")
@@ -331,7 +320,7 @@ class GameViewModel(
                 for (box in boxes) {
                     val oldBox = oldField.find { it.x == box.x && it.y == box.y }
                     val oldBoxIndex = oldField.indexOfFirst { it.x == box.x && it.y == box.y }
-                    if (oldBoxIndex >= 0 && oldBox != null) {
+                    if (oldBoxIndex != -1 && oldBox != null) {
                         oldField[oldBoxIndex] = oldBox.copy(color = "white", cost = 0, user_color_id = null)
                     } else {
                         Timber.e("oldField error")
@@ -347,11 +336,10 @@ class GameViewModel(
         }
 
         fun setQuestion(q: Question?) {
+            if (question.value != null && q != null) {
+                showExactQuestion.postValue(false)
+            }
             question.postValue(q)
-        }
-
-        fun setExactQuestion(q: Question?) {
-            exactQuestion.postValue(q)
         }
 
         fun setPlayers(userColors: List<UserColor>) {

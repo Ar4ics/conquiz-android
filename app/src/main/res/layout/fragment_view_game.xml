@@ -46,6 +46,8 @@
             <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/user_colors"
                     app:layout_constraintTop_toBottomOf="@id/game_title"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:itemBinding="@{usercolorsbinding}"
@@ -66,7 +68,9 @@
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     tools:listitem="@layout/view_box_item"
                     android:visibility="visible"
-                    app:layout_constraintTop_toBottomOf="@id/user_colors" tools:layout_editor_absoluteX="16dp"/>
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/user_colors" />
 
             <ProgressBar
                     app:layout_constraintStart_toStartOf="parent"
@@ -97,7 +101,7 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="@{state.whoMovesName}"
-                    android:visibility="@{state.whoMovesNameIsVisible ? View.VISIBLE : View.GONE, default=gone }"
+                    android:visibility="@{(state.whoMoves != null &amp;&amp; state.winner == null) ? View.VISIBLE : View.GONE, default=gone }"
                     tools:visibility="visible"
                     tools:text="Ходит username"
                     android:gravity="center"
@@ -113,6 +117,8 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="@{state.winnerName}"
+                    android:visibility="@{(state.winner != null) ? View.VISIBLE : View.GONE, default=gone }"
+                    tools:visibility="visible"
                     tools:text="Победитель username"
                     android:gravity="center"
                     android:layout_marginTop="8dp"

@@ -28,6 +28,9 @@ class ProfileFragment : AppFragment() {
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<MaterialButton>(R.id.sign_in).setOnClickListener { goLogin() }
         view.findViewById<MaterialButton>(R.id.sign_out).setOnClickListener { goLogout() }
+        view.findViewById<MaterialButton>(R.id.go_to_games).setOnClickListener {
+            navController().navigate(ProfileFragmentDirections.actionProfilePageToListGames())
+        }
     }
 
     private fun goLogin() {

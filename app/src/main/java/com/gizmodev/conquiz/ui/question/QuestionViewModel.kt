@@ -104,11 +104,13 @@ class QuestionViewModel(
                     }
                 }
                 val correct = newAnswerVariants.indexOfFirst { it.value == ar.correct }
-                if (correct > 0) {
+                if (correct != -1) {
                     newAnswerVariants[correct] = newAnswerVariants[correct].copy(is_correct = true)
+                } else {
+                    Timber.e("error setting correct variant")
                 }
                 val newGameQuestion = gq.copy(answers = newAnswerVariants)
-                Timber.d("results: $newGameQuestion")
+                Timber.d("AnswerResults: $newGameQuestion")
                 question.postValue(newGameQuestion)
             } else {
                 Timber.e("error setting AnswerResults")
@@ -118,8 +120,8 @@ class QuestionViewModel(
         fun setCompetitiveAnswerResults(car: CompetitiveAnswerResults) {
             Timber.d("setting CompetitiveAnswerResults: $car")
             val gq = question.value
-            if (gq != null) {
-                if (gq.answers != null) {
+            if (gq?.answers != null) {
+                if (!car.is_exact) {
                     val newAnswerVariants = gq.answers.toMutableList()
                     for ((index, av) in gq.answers.withIndex()) {
                         val users = car.results.filter { it.answer == av.value }
@@ -130,11 +132,13 @@ class QuestionViewModel(
                         }
                     }
                     val correct = newAnswerVariants.indexOfFirst { it.value == car.correct }
-                    if (correct > 0) {
+                    if (correct != -1) {
                         newAnswerVariants[correct] = newAnswerVariants[correct].copy(is_correct = true)
+                    } else {
+                        Timber.e("error setting correct variant")
                     }
                     val newGameQuestion = gq.copy(answers = newAnswerVariants)
-                    Timber.d("results: $newGameQuestion")
+                    Timber.d("CompetitiveAnswerResults: $newGameQuestion")
                     question.postValue(newGameQuestion)
                 } else {
                     val newAnswerVariants = mutableListOf<AnswerVariant>()
@@ -164,7 +168,7 @@ class QuestionViewModel(
                         )
                     }
                     val newGameQuestion = gq.copy(answers = newAnswerVariants)
-                    Timber.d("results exact: $newGameQuestion")
+                    Timber.d("CompetitiveAnswerResults exact: $newGameQuestion")
                     question.postValue(newGameQuestion)
                 }
             } else {
@@ -180,7 +184,7 @@ class QuestionViewModel(
 
                     val newAnswerVariants = gq.answers.toMutableList()
                     val new = gq.answers.indexOfFirst { it.value == answerVariant.value }
-                    if (new > 0) {
+                    if (new != -1) {
                         newAnswerVariants[new] = answerVariant
                         val newGameQuestion = gq.copy(answers = newAnswerVariants)
                         Timber.d("set variant: $newGameQuestion")

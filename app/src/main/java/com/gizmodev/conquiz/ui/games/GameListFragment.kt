@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.gizmodev.conquiz.BR
 import com.gizmodev.conquiz.databinding.FragmentListGamesBinding
@@ -40,6 +41,13 @@ class GameListFragment : AppFragment(), OnGameClickListener {
             )
         )
 
+        vm.state.my.observe(this, Observer {
+            vm.setFilteredGames(it, vm.state.checkedButton.value)
+        })
+
+        vm.state.checkedButton.observe(this, Observer {
+            vm.setFilteredGames(vm.state.my.value, it)
+        })
     }
 
     override fun onGameClicked(game: Game) {

@@ -18,6 +18,10 @@ data class Result<T>(
         }
     }
 
+    fun completed(): Boolean {
+        return status == Status.COMPLETED
+    }
+
     fun fail() : Boolean {
         return data == null && status == Status.COMPLETED
     }

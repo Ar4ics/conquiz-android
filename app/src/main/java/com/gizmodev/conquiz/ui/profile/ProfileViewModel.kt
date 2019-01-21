@@ -39,6 +39,7 @@ class ProfileViewModel(
 //            }
 //        }
         state.setSigningIn()
+        loadPusher()
         Observable.defer {
             val token = sharedPrefStorage.readToken()
             Observable.just(token)

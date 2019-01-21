@@ -13,17 +13,17 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-            tools:background="#ffeecc"
             android:layout_width="match_parent"
             android:layout_height="50dp">
         <TextView
                 android:padding="8dp"
                 android:id="@+id/username"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/place"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/place"
+                app:layout_constraintBottom_toBottomOf="parent"
                 android:textStyle="bold"
                 android:layout_width="0dp"
+                app:layout_constraintStart_toStartOf="parent"
                 android:layout_height="match_parent"
                 android:gravity="start|center_vertical"
                 android:text="@{user_color.user.name}"
@@ -31,8 +31,11 @@
         <TextView
                 android:padding="8dp"
                 android:id="@+id/place"
-                app:layout_constraintRight_toLeftOf="@id/score"
-                android:layout_width="0dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/username"
+                app:layout_constraintEnd_toStartOf="@id/score"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="@{user_color.getUserPlace()}"
@@ -40,11 +43,14 @@
         <TextView
                 android:padding="8dp"
                 android:id="@+id/score"
+                app:layout_constraintStart_toEndOf="@id/place"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:background="@{ColorPicker.pick(user_color.color)}"
                 android:gravity="center"
                 android:layout_gravity="end"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="@{String.valueOf(user_color.score)}"
                 tools:text="1000"/>

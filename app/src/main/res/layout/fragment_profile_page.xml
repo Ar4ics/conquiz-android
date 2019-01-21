@@ -18,21 +18,31 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-
         <com.google.android.material.button.MaterialButton
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/layout"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintBottom_toTopOf="@id/go_to_games"
                 android:id="@+id/sign_in"
                 android:text="@string/sign_in"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                tools:visibility="visible"
                 android:visibility="@{state.user.fail() ? View.VISIBLE : View.GONE, default=gone }"
-        />
+                tools:visibility="visible"/>
+
+        <com.google.android.material.button.MaterialButton
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/layout"
+                android:id="@+id/go_to_games"
+                android:text="Перейти к играм"
+                app:layout_constraintTop_toBottomOf="@id/sign_in"
+                android:visibility="@{state.user.completed() ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
         <LinearLayout
                 android:orientation="vertical"
@@ -43,7 +53,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginTop="8dp"
                 android:id="@+id/layout"
-                app:layout_constraintTop_toBottomOf="@+id/sign_in"
+                app:layout_constraintTop_toBottomOf="@+id/go_to_games"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:layout_width="match_parent">
