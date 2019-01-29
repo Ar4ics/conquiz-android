@@ -1,16 +1,18 @@
 package com.gizmodev.conquiz.ui.game
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.gizmodev.conquiz.BR
 import com.gizmodev.conquiz.databinding.FragmentViewGameBinding
 import com.gizmodev.conquiz.model.Box
-import com.gizmodev.conquiz.model.Game
+import com.gizmodev.conquiz.model.GameMessage
 import com.gizmodev.conquiz.model.Question
 import com.gizmodev.conquiz.model.UserColor
 import com.gizmodev.conquiz.ui.core.AppFragment
@@ -31,11 +33,11 @@ class GameFragment : AppFragment(), OnBoxClickListener {
     @Inject
     lateinit var vm: GameViewModel
 
-    lateinit var game: Game
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        game = GameFragmentArgs.fromBundle(arguments!!).game
+        Timber.d("savedInstanceState = $savedInstanceState")
+        if (savedInstanceState != null) return
+        val game = GameFragmentArgs.fromBundle(arguments!!).game
         vm.loadGame(game)
         vm.loadPusher()
     }
@@ -43,14 +45,18 @@ class GameFragment : AppFragment(), OnBoxClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentViewGameBinding.inflate(inflater, container, false)
             .apply {
-                setLifecycleOwner(this@GameFragment)
+                lifecycleOwner = this@GameFragment
                 listener = this@GameFragment
                 state = this@GameFragment.vm.state
                 boxesbinding = ItemBinding
                     .of<Box>(BR.box, com.gizmodev.conquiz.R.layout.view_box_item)
                     .bindExtra(BR.listener, this@GameFragment)
+
                 usercolorsbinding = ItemBinding
                     .of<UserColor>(BR.user_color, com.gizmodev.conquiz.R.layout.view_user_color_item)
+
+                messagesbinding = ItemBinding
+                    .of<GameMessage>(BR.message, com.gizmodev.conquiz.R.layout.view_message_item)
                 executePendingBindings()
             }
             .root
@@ -58,7 +64,10 @@ class GameFragment : AppFragment(), OnBoxClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val lm = boxes.layoutManager as GridLayoutManager
-        lm.spanCount = game.count_x
+
+        Timber.d("view = $view, savedInstanceState = $savedInstanceState")
+
+        lm.spanCount = vm.gameHolder.game?.count_x ?: 0
 
         user_colors.addItemDecoration(
             DividerItemDecoration(
@@ -80,6 +89,25 @@ class GameFragment : AppFragment(), OnBoxClickListener {
             )
         )
 
+        game_messages.addItemDecoration(
+            DividerItemDecoration(
+                context,
+                DividerItemDecoration.VERTICAL
+            )
+        )
+
+        game_messages.adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+                val pos = game_messages.adapter?.itemCount
+                Timber.d("game_messages pos: $pos")
+
+                if (pos != null && pos > 0) {
+                    game_messages.smoothScrollToPosition(pos - 1)
+                }
+            }
+        })
+
         open_question.setOnClickListener {
             val q = vm.state.question.value
             if (q != null) {
@@ -87,7 +115,22 @@ class GameFragment : AppFragment(), OnBoxClickListener {
             }
         }
 
-        vm.state.question.observe(this, Observer {
+        message_input.setOnKeyListener { v, keyCode, event ->
+            Timber.d("$v - $keyCode - $event")
+            if (event.action == KeyEvent.ACTION_UP) {
+                when (keyCode) {
+                    KeyEvent.KEYCODE_ENTER -> {
+                        Timber.d("text = ${message_input.text}")
+                        val message = message_input.text.toString().trim()
+                        vm.sendMessage(message)
+                        message_input.text?.clear()
+                    }
+                }
+            }
+            return@setOnKeyListener false
+        }
+
+        vm.state.question.observe(viewLifecycleOwner, Observer {
             Timber.d("question=$it")
             if (it != null) {
                 if (!it.is_exact_answer) {
@@ -98,7 +141,7 @@ class GameFragment : AppFragment(), OnBoxClickListener {
             }
         })
 
-        vm.state.exactQuestion.observe(this, Observer {
+        vm.state.exactQuestion.observe(viewLifecycleOwner, Observer {
             Timber.d("exactQuestion=$it")
             if (it) {
                 val q = vm.state.question.value
@@ -108,7 +151,7 @@ class GameFragment : AppFragment(), OnBoxClickListener {
             }
         })
 
-        vm.state.answerResults.observe(this, Observer {
+        vm.state.answerResults.observe(viewLifecycleOwner, Observer {
             val prev = fragmentManager?.findFragmentByTag("question")
             if (prev != null) {
                 val df = prev as QuestionFragment
@@ -116,7 +159,7 @@ class GameFragment : AppFragment(), OnBoxClickListener {
             }
         })
 
-        vm.state.competitiveAnswerResults.observe(this, Observer {
+        vm.state.competitiveAnswerResults.observe(viewLifecycleOwner, Observer {
             val prev = fragmentManager?.findFragmentByTag("question")
             if (prev != null) {
                 val df = prev as QuestionFragment
@@ -131,7 +174,7 @@ class GameFragment : AppFragment(), OnBoxClickListener {
         if (prev != null) {
             val df = prev as QuestionFragment
             Timber.d("QuestionFragment closing")
-            df.dismiss()
+            //df.dialog?.dismiss()
         }
     }
 

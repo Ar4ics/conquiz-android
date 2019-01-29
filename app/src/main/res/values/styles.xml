@@ -8,6 +8,25 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="materialButtonStyle">@style/Button</item>
+        <!--<item name="android:dialogTheme">@style/AppDialogTheme</item>-->
+    </style>
+    <style name="Button" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:textColor">@color/blue</item>
+        <item name="backgroundTint">@color/white</item>
+    </style>
+    <style name="AppDialogTheme" parent="Theme.MaterialComponents.Light.Dialog">
+        <!-- Define color properties as desired -->
+        <item name="colorPrimary">@color/dark_blue</item>
+        <item name="colorPrimaryDark">#000</item>
+        <item name="android:textColorHighlight">@color/light_blue</item>
+        <item name="colorAccent">@color/dark_blue</item>
+        <item name="colorControlNormal">@color/dark_blue</item>
+        <!-- Define window properties as desired -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
     </style>
 
 </resources>

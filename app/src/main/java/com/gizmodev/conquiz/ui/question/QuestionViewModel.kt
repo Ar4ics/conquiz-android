@@ -157,7 +157,7 @@ class QuestionViewModel(
                             )
                         )
                     }
-                    for ((index, result) in car.results.withIndex()) {
+                    for (result in car.results) {
                         newAnswerVariants.add(
                             AnswerVariant(
                                 title = "Дан ответ: ${result.answer}",

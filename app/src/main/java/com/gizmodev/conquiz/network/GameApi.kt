@@ -1,6 +1,7 @@
 package com.gizmodev.conquiz.network
 
 import com.gizmodev.conquiz.model.GameDetails
+import com.gizmodev.conquiz.model.GameMessageGroup
 import com.gizmodev.conquiz.model.GamesInfo
 import io.reactivex.Single
 import okhttp3.ResponseBody
@@ -30,5 +31,15 @@ interface GameApi {
         @Field("userAnswer") userAnswer: Int,
         @Field("questionId") questionId: Int,
         @Field("userColorId") userColorId: Int
+    ): Single<Response<ResponseBody>>
+
+    @GET("games/{id}/message")
+    fun getGameMessages(@Path(value = "id", encoded = true) id: Int): Single<List<GameMessageGroup>>
+
+    @FormUrlEncoded
+    @POST("games/{id}/message")
+    fun sendMessage(
+        @Path(value = "id", encoded = true) id: Int,
+        @Field("message") message: String
     ): Single<Response<ResponseBody>>
 }

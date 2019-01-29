@@ -15,58 +15,59 @@
     <androidx.constraintlayout.widget.ConstraintLayout
             android:padding="8dp"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="wrap_content"
             android:onClick="@{() -> listener.onGameClicked(game)}">
 
         <TextView
-                android:id="@+id/status"
-                android:layout_width="wrap_content"
-                android:text="@{game.getStageText()}"
-                tools:text="Game Stage"
+                android:id="@+id/game_title"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
-        <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:gravity="start|center_vertical"
-                android:maxLines="2"
+                android:gravity="center"
                 android:textSize="20sp"
                 android:text="@{game.title}"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/players"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-
                 tools:text="Игра 1" />
 
-        <TextView
-                android:id="@+id/date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="2"
-                android:text="@{game.date}"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                tools:text="Дата" />
 
         <TextView
                 android:id="@+id/players"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:maxLines="2"
                 android:gravity="center"
                 android:text="@{game.players()}"
-                app:layout_constraintTop_toBottomOf="@id/title"
+                app:layout_constraintTop_toBottomOf="@id/game_title"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/date"
+                tools:text="@tools:sample/lorem" />
+
+
+        <TextView
+                android:id="@+id/status"
+                android:layout_width="0dp"
+                android:text="@{game.getStageText()}"
+                tools:text="Game Stage"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toStartOf="@id/date"
+                app:layout_constraintTop_toBottomOf="@id/players"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+                android:id="@+id/date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@{game.date}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/status"
+                app:layout_constraintTop_toBottomOf="@id/players"
                 app:layout_constraintBottom_toBottomOf="parent"
-                tools:text="Игроки" />
+                tools:text="@tools:sample/lorem" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

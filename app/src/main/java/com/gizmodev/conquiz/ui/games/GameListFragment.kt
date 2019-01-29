@@ -7,11 +7,13 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.gizmodev.conquiz.BR
+import com.gizmodev.conquiz.R
 import com.gizmodev.conquiz.databinding.FragmentListGamesBinding
 import com.gizmodev.conquiz.model.Game
 import com.gizmodev.conquiz.ui.core.AppFragment
 import kotlinx.android.synthetic.main.fragment_list_games.*
 import me.tatarka.bindingcollectionadapter2.ItemBinding
+import timber.log.Timber
 import javax.inject.Inject
 
 class GameListFragment : AppFragment(), OnGameClickListener {
@@ -22,11 +24,10 @@ class GameListFragment : AppFragment(), OnGameClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentListGamesBinding.inflate(inflater, container, false)
             .apply {
-                setLifecycleOwner(this@GameListFragment)
+                lifecycleOwner = this@GameListFragment
                 listener = this@GameListFragment
                 state = this@GameListFragment.vm.state
-                gamesbinding = ItemBinding
-                    .of<Game>(BR.game, com.gizmodev.conquiz.R.layout.view_game_item)
+                gamesbinding = ItemBinding.of<Game>(BR.game, com.gizmodev.conquiz.R.layout.view_game_item)
                     .bindExtra(BR.listener, this@GameListFragment)
                 executePendingBindings()
             }
@@ -41,16 +42,32 @@ class GameListFragment : AppFragment(), OnGameClickListener {
             )
         )
 
-        vm.state.my.observe(this, Observer {
-            vm.setFilteredGames(it, vm.state.checkedButton.value)
+//        vm.state.my.observe(viewLifecycleOwner, Observer {
+//            vm.setFilteredGames(it, vm.state.checkedButton.value)
+//        })
+//
+//        vm.state.checkedButton.observe(viewLifecycleOwner, Observer {
+//            vm.setFilteredGames(vm.state.my.value, it)
+//        })
+
+        vm.state.liveDataMerger.observe(viewLifecycleOwner, Observer {
+            Timber.d("liveDataMerger = $it")
+            vm.setFilteredGames(vm.state.my.value ?: false, vm.state.checkedButton.value ?: R.id.all)
         })
 
-        vm.state.checkedButton.observe(this, Observer {
-            vm.setFilteredGames(vm.state.my.value, it)
-        })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Timber.d("view destroyed")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.d("destroyed")
     }
 
     override fun onGameClicked(game: Game) {
-        navController().navigate(GameListFragmentDirections.ActionListGamesToViewGame(game))
+        navController().navigate(GameListFragmentDirections.actionListGamesToViewGame(game))
     }
 }

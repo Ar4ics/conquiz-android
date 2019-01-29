@@ -33,4 +33,6 @@
     <string name="open_question">Открыть вопрос</string>
     <string name="input_exact_answer">Введите числовой ответ</string>
     <string name="game_status">Завершена</string>
+    <string name="go_to_games_list">Перейти к играм</string>
+    <string name="input_message">Введите сообщение</string>
 </resources>

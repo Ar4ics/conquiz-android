@@ -1,6 +1,6 @@
 package com.gizmodev.conquiz.network
 
-import com.gizmodev.conquiz.utils.Constants.REST_API_URL
+import com.gizmodev.conquiz.utils.Constants.REST_API_URL_HEROKU
 import dagger.Module
 import dagger.Provides
 import io.reactivex.schedulers.Schedulers
@@ -55,7 +55,7 @@ class NetworkModule {
     internal fun provideRetrofitInterface(client: OkHttpClient): Retrofit {
 
         return Retrofit.Builder()
-            .baseUrl(REST_API_URL)
+            .baseUrl(REST_API_URL_HEROKU)
             .client(client)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create())

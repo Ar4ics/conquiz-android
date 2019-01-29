@@ -7,6 +7,7 @@
     <data>
 
         <import type="android.view.View"/>
+        <import type="com.gizmodev.conquiz.model.Game"/>
 
         <variable
                 name="listener"
@@ -18,7 +19,7 @@
 
         <variable
                 name="gamesbinding"
-                type="me.tatarka.bindingcollectionadapter2.ItemBinding"/>
+                type="me.tatarka.bindingcollectionadapter2.ItemBinding&lt;Game&gt;"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -42,30 +43,30 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:weightSum="3"
-                    tools:checkedButton="@id/first"
+                    tools:checkedButton="@id/all"
                     android:checkedButton="@={state.checkedButton}"
                     android:orientation="horizontal">
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                        android:id="@+id/first"
+                <RadioButton
+                        android:id="@+id/all"
                         android:layout_weight="1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Все"/>
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                        android:id="@+id/second"
+                <RadioButton
+                        android:id="@+id/current"
                         android:layout_weight="1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Текущие"/>
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                        android:id="@+id/third"
+                <RadioButton
+                        android:id="@+id/finished"
                         android:layout_weight="1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Завершенные"/>
             </RadioGroup>
 
-            <com.google.android.material.checkbox.MaterialCheckBox
+            <CheckBox
                     android:id="@+id/my"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

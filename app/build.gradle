@@ -56,10 +56,15 @@ android {
         exclude "LICENSE.txt"
         exclude ".readme"
     }
+    buildToolsVersion = '28.0.3'
 }
 
 androidExtensions {
     experimental true
+}
+
+kapt {
+    correctErrorTypes = true
 }
 
 configurations {
@@ -112,14 +117,17 @@ dependencies {
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$versions.leakcanary"
     debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:$versions.leakcanary"
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13-beta-1'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
     implementation 'com.android.support:multidex:1.0.3'
 
-    implementation 'com.pusher:pusher-java-client:1.8.0'
+    implementation 'com.pusher:pusher-java-client:1.8.2'
 
+//    implementation 'com.airbnb.android:epoxy:3.2.0'
+//    implementation "com.airbnb.android:epoxy-databinding:3.2.0"
+//    kapt 'com.airbnb.android:epoxy-processor:3.2.0'
 //    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.0'
 //    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.0'
 //

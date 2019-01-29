@@ -1,7 +1,5 @@
 package com.gizmodev.conquiz.ui.game
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.gizmodev.conquiz.model.*
@@ -11,8 +9,11 @@ import com.gizmodev.conquiz.network.PusherHolder
 import com.gizmodev.conquiz.network.Result
 import com.gizmodev.conquiz.ui.core.AppViewModel
 import com.gizmodev.conquiz.utils.DateTimePicker
+import com.gizmodev.conquiz.utils.DoubleTrigger
 import com.gizmodev.conquiz.utils.toString
 import com.pusher.client.channel.ChannelEventListener
+import com.pusher.client.channel.PresenceChannelEventListener
+import com.pusher.client.channel.User
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -29,11 +30,6 @@ class GameViewModel(
     val gameHolder: GameHolder
 ) : AppViewModel() {
 
-
-    init {
-        Timber.d("user: ${gameHolder.user}")
-    }
-
     val state = State()
     fun loadGame(game: Game) {
         gameHolder.game = game
@@ -45,6 +41,24 @@ class GameViewModel(
                 { result -> onRetrieveGameSuccess(result) },
                 { error -> onRetrieveGameError(error) }
             ).untilCleared()
+        state.setGameMessagesLoading()
+        gameApi.getGameMessages(game.id)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { result -> onRetrieveGameMessagesSuccess(result) },
+                { error -> onRetrieveGameMessagesError(error) }
+            ).untilCleared()
+    }
+
+    private fun onRetrieveGameMessagesError(throwable: Throwable) {
+        Timber.e("failed to load game: ${throwable.localizedMessage}")
+        state.setGameMessagesError(throwable)
+    }
+
+    private fun onRetrieveGameMessagesSuccess(result: List<GameMessageGroup>) {
+        Timber.d("success load messages: $result")
+        state.setGameMessages(result)
     }
 
 
@@ -60,7 +74,7 @@ class GameViewModel(
         Timber.e("failed to load game: ${error.localizedMessage}")
     }
 
-    var clickedBox: Box? = null
+    private var clickedBox: Box? = null
 
     fun clickBox(box: Box) {
         clickedBox = box
@@ -94,19 +108,46 @@ class GameViewModel(
         state.setGameError(error)
     }
 
+
+    fun sendMessage(message: String) {
+        val user = gameHolder.user
+        val game = gameHolder.game
+
+        if (user != null && game != null) {
+            gameApi.sendMessage(game.id, message)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { result -> onGameMessageSuccess(result) },
+                    { error -> onGameMessageError(error) }
+                ).untilCleared()
+        }
+    }
+
+    private fun onGameMessageSuccess(result: Response<ResponseBody>) {
+        val response = result.body()?.string()
+        Timber.d("success message: $response")
+    }
+
+    private fun onGameMessageError(error: Throwable) {
+        Timber.e("failed to send message: ${error.localizedMessage}")
+    }
+
     fun loadPusher() {
 
         pusherHolder.pusher?.subscribe(
             "game.${gameHolder.game?.id}",
             object : ChannelEventListener {
-                override fun onSubscriptionSucceeded(channelName: String) {
+                override fun onSubscriptionSucceeded(channelName: String?) {
                     Timber.d("Subscribed to channel $channelName")
                 }
 
-                override fun onEvent(channelName: String, eventName: String, data: String) {
+                override fun onEvent(channelName: String?, eventName: String?, data: String?) {
                     Timber.d("Event $eventName on channel $channelName with data $data")
 
-                    when (eventName.removePrefix(PusherHolder.EventPrefix)) {
+                    if (data == null) return
+
+                    when (eventName?.removePrefix(PusherHolder.EventPrefix)) {
                         PusherHolder.BaseCreated, PusherHolder.BoxClicked -> {
                             val box = Result.fromJson<Box>(data)
                             Timber.d("box: $box")
@@ -228,27 +269,85 @@ class GameViewModel(
                                 pusherHolder.errorParsingJson()
                             }
                         }
+                        PusherHolder.GameMessageCreated -> {
+                            val gameMessage = Result.fromJson<GameMessage>(data)
+                            Timber.d("gameMessage: $gameMessage")
+                            if (gameMessage != null) {
+                                state.addGameMessage(gameMessage)
+                            } else {
+                                pusherHolder.errorParsingJson()
+                            }
+                        }
                     }
                 }
             },
             *PusherHolder.AllEvents
         )
+
+
+        pusherHolder.pusher?.subscribePresence("presence-users.${gameHolder.game?.id}", object : PresenceChannelEventListener {
+            override fun onEvent(channelName: String?, eventName: String?, data: String?) {
+
+            }
+
+            override fun onAuthenticationFailure(message: String?, e: Exception?) {
+                Timber.d("failed entering channel: $message $e")
+            }
+
+            override fun onSubscriptionSucceeded(channelName: String?) {
+                Timber.d("success entering channel: $channelName")
+            }
+
+            override fun onUsersInformationReceived(channelName: String?, users: MutableSet<User>?) {
+                Timber.d("users in channel: $users")
+
+                if (users == null) return
+                val us = mutableListOf<com.gizmodev.conquiz.model.User>()
+
+                for (user in users) {
+                    val info = Result.fromJson<com.gizmodev.conquiz.model.User>(user.info)
+                    if (info != null) {
+                        us.add(info)
+                    }
+                }
+
+                state.onlineUsers.postValue(us)
+            }
+
+            override fun userSubscribed(channelName: String?, user: User?) {
+                Timber.d("user entered: $user")
+
+                if (user == null) return
+                val u = Result.fromJson<com.gizmodev.conquiz.model.User>(user.info)
+                val oldUsers = state.onlineUsers.value?.toMutableList()
+                if (oldUsers != null && u != null) {
+                    oldUsers.add(u)
+                    state.onlineUsers.postValue(oldUsers)
+                }
+            }
+
+            override fun userUnsubscribed(channelName: String?, user: User?) {
+                Timber.d("user leaved: $user")
+
+                if (user == null) return
+                val u = Result.fromJson<com.gizmodev.conquiz.model.User>(user.info)
+                val oldUsers = state.onlineUsers.value?.toMutableList()
+                if (oldUsers != null && u != null) {
+                    oldUsers.remove(u)
+                    state.onlineUsers.postValue(oldUsers)
+                }
+            }
+
+        })
     }
 
     override fun onCleared() {
         pusherHolder.pusher?.unsubscribe("game.${gameHolder.game?.id}")
+        pusherHolder.pusher?.unsubscribe("presence-users.${gameHolder.game?.id}")
         super.onCleared()
     }
 
-    class DoubleTrigger<A, B>(a: LiveData<A>, b: LiveData<B>) : MediatorLiveData<Pair<A?, B?>>() {
-        init {
-            addSource(a) { value = it to b.value }
-            addSource(b) { value = a.value to it }
-        }
-    }
-
     class State {
-
         val gameDetails = MutableLiveData<Result<GameDetails>>()
         val field = MutableLiveData<List<Box>>()
         val players = MutableLiveData<List<UserColor>>()
@@ -376,6 +475,46 @@ class GameViewModel(
             setWinner(game.winner)
             setCompetitiveBox(game.competitive_box)
             setQuestion(game.question)
+        }
+
+
+        val gameMessages = MutableLiveData<Result<List<GameMessage>>>()
+        val messages = MutableLiveData<List<GameMessage>>()
+
+        val onlineUsers = MutableLiveData<List<com.gizmodev.conquiz.model.User>>()
+        val onlineUsersText = Transformations.map(onlineUsers) { list ->
+            list.joinToString { it.name }
+        }
+
+        fun setGameMessagesError(throwable: Throwable) {
+            gameMessages.value = Result(
+                Result.Status.COMPLETED,
+                null,
+                throwable
+            )
+        }
+
+        fun setGameMessagesLoading() {
+            gameMessages.value =
+                Result(Result.Status.LOADING, null, null)
+        }
+
+        fun setGameMessages(gm: List<GameMessageGroup>) {
+            val msgs = gm.flatMap { it.messages }
+            gameMessages.value = Result(
+                Result.Status.COMPLETED,
+                msgs,
+                null
+            )
+            messages.value = msgs
+        }
+
+        fun addGameMessage(gm: GameMessage) {
+            val m = messages.value?.toMutableList()
+            if (m != null) {
+                m.add(gm)
+                messages.postValue(m)
+            }
         }
     }
 }

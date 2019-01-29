@@ -26,6 +26,7 @@ class PusherHolder(private val context: Context, private val authenticationInter
         const val NewExactQuestion = "NewExactQuestion"
         const val UserColorsChanged = "UserColorsChanged"
         const val WinnerFound = "WinnerFound"
+        const val GameMessageCreated = "GameMessageCreated"
 
         val AllEvents = listOf(
             BaseCreated,
@@ -38,7 +39,8 @@ class PusherHolder(private val context: Context, private val authenticationInter
             NewQuestion,
             NewExactQuestion,
             UserColorsChanged,
-            WinnerFound
+            WinnerFound,
+            GameMessageCreated
         ).map { "$EventPrefix$it" }.toTypedArray()
     }
 
@@ -50,7 +52,7 @@ class PusherHolder(private val context: Context, private val authenticationInter
 
     fun connect() {
         val auth =
-            HttpAuthorizer("${Constants.REST_API_URL}${context.resources.getString(R.string.pusher_auth_endpoint)}")
+            HttpAuthorizer("${Constants.REST_API_URL_HEROKU}${context.resources.getString(R.string.pusher_auth_endpoint)}")
         auth.setHeaders(mapOf("Authorization" to "Bearer ${authenticationInterceptor.token}"))
         val options =
             PusherOptions().setCluster(context.resources.getString(R.string.pusher_cluster)).setAuthorizer(auth)

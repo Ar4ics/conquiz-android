@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.gizmodev.conquiz.R
 import com.gizmodev.conquiz.databinding.FragmentProfilePageBinding
 import com.gizmodev.conquiz.ui.core.AppFragment
-import com.google.android.material.button.MaterialButton
+import kotlinx.android.synthetic.main.fragment_profile_page.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class ProfileFragment : AppFragment() {
@@ -18,7 +18,7 @@ class ProfileFragment : AppFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentProfilePageBinding.inflate(inflater, container, false)
             .apply {
-                setLifecycleOwner(this@ProfileFragment)
+                lifecycleOwner = this@ProfileFragment
                 state = this@ProfileFragment.vm.state
                 executePendingBindings()
             }
@@ -26,11 +26,21 @@ class ProfileFragment : AppFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.findViewById<MaterialButton>(R.id.sign_in).setOnClickListener { goLogin() }
-        view.findViewById<MaterialButton>(R.id.sign_out).setOnClickListener { goLogout() }
-        view.findViewById<MaterialButton>(R.id.go_to_games).setOnClickListener {
+        sign_in.setOnClickListener { goLogin() }
+        sign_out.setOnClickListener { goLogout() }
+        go_to_games.setOnClickListener {
             navController().navigate(ProfileFragmentDirections.actionProfilePageToListGames())
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Timber.d("view destroyed")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.d("destroyed")
     }
 
     private fun goLogin() {

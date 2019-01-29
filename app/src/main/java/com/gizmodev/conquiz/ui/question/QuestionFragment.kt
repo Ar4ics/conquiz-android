@@ -1,10 +1,8 @@
 package com.gizmodev.conquiz.ui.question
 
+import android.app.Dialog
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.gizmodev.conquiz.BR
 import com.gizmodev.conquiz.databinding.FragmentViewQuestionBinding
@@ -15,6 +13,7 @@ import kotlinx.android.synthetic.main.fragment_view_question.*
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import timber.log.Timber
 import javax.inject.Inject
+
 
 
 
@@ -32,14 +31,25 @@ class QuestionFragment : AppDialogFragment(), OnVariantClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Timber.d("savedInstanceState = $savedInstanceState")
+
         question = QuestionFragmentArgs.fromBundle(arguments!!).question
         vm.state.setQuestion(question)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
-        FragmentViewQuestionBinding.inflate(inflater, container, false)
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+
+        return dialog
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+
+        val view = FragmentViewQuestionBinding.inflate(inflater, container, false)
             .apply {
-                setLifecycleOwner(this@QuestionFragment)
+                lifecycleOwner = this@QuestionFragment
                 listener = this@QuestionFragment
                 state = this@QuestionFragment.vm.state
                 variantsbinding = ItemBinding
@@ -49,8 +59,32 @@ class QuestionFragment : AppDialogFragment(), OnVariantClickListener {
             }
             .root
 
+        return view
+    }
+
+    private fun setWindow() {
+        val window = dialog!!.window!!
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        window.setGravity(Gravity.CENTER_VERTICAL)
+
+//        val window = dialog!!.window!!
+//        val lp = WindowManager.LayoutParams()
+//        lp.copyFrom(window.attributes)
+//        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
+//        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+//        lp.gravity = Gravity.BOTTOM
+//        lp.horizontalMargin = 0.0f
+//        lp.horizontalMargin = 0.0f
+//        window.attributes = lp
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        Timber.d("view = $view, savedInstanceState = $savedInstanceState")
+
+        setWindow()
 
         variants.addItemDecoration(
             DividerItemDecoration(

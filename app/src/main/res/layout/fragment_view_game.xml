@@ -6,6 +6,9 @@
 
     <data>
         <import type="android.view.View"/>
+        <import type="com.gizmodev.conquiz.model.Box"/>
+        <import type="com.gizmodev.conquiz.model.UserColor"/>
+        <import type="com.gizmodev.conquiz.model.GameMessage"/>
 
         <variable
                 name="listener"
@@ -17,19 +20,56 @@
 
         <variable
                 name="boxesbinding"
-                type="me.tatarka.bindingcollectionadapter2.ItemBinding"/>
+                type="me.tatarka.bindingcollectionadapter2.ItemBinding&lt;Box&gt;"/>
 
         <variable
                 name="usercolorsbinding"
-                type="me.tatarka.bindingcollectionadapter2.ItemBinding"/>
+                type="me.tatarka.bindingcollectionadapter2.ItemBinding&lt;UserColor&gt;"/>
+
+        <variable
+                name="messagesbinding"
+                type="me.tatarka.bindingcollectionadapter2.ItemBinding&lt;GameMessage&gt;"/>
     </data>
 
-    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent">
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp">
+
+        <ProgressBar
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:id="@+id/progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="@{state.gameDetails.loading() ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"/>
+
+        <TextView
+                android:text="@{state.gameDetails.error()}"
+                android:visibility="@{state.gameDetails.hasError() ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"
+                tools:text="error found"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <androidx.core.widget.NestedScrollView
+            android:visibility="@{state.gameDetails.success() ? View.VISIBLE : View.GONE, default=gone }"
+            tools:visibility="visible"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:layout_height="wrap_content">
 
             <TextView
                     android:id="@+id/game_title"
@@ -43,9 +83,22 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>
 
+            <TextView
+                    android:id="@+id/online_users"
+                    android:text="@{`Кто онлайн: ` + state.onlineUsersText}"
+                    android:visibility="@{state.onlineUsersText != null ? View.VISIBLE : View.GONE, default=gone }"
+                    tools:visibility="visible"
+                    android:gravity="center"
+                    tools:text="@tools:sample/lorem"
+                    app:layout_constraintTop_toBottomOf="@id/game_title"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
             <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/user_colors"
-                    app:layout_constraintTop_toBottomOf="@id/game_title"
+                    app:layout_constraintTop_toBottomOf="@id/online_users"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     android:layout_width="match_parent"
@@ -72,19 +125,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/user_colors" />
 
-            <ProgressBar
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:id="@+id/progress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:visibility="@{state.gameDetails.loading() ? View.VISIBLE : View.GONE, default=gone }"
-                    tools:visibility="visible"/>
-
-            <com.google.android.material.button.MaterialButton
+            <Button
                     android:id="@+id/open_question"
                     android:text="@string/open_question"
                     android:layout_marginTop="8dp"
@@ -106,7 +147,7 @@
                     tools:text="Ходит username"
                     android:gravity="center"
                     android:layout_marginTop="8dp"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     app:layout_constraintTop_toBottomOf="@id/open_question"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>
@@ -122,24 +163,50 @@
                     tools:text="Победитель username"
                     android:gravity="center"
                     android:layout_marginTop="8dp"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     app:layout_constraintTop_toBottomOf="@id/who_moves"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>
 
-            <TextView
-                    android:text="@{state.gameDetails.error()}"
-                    android:visibility="@{state.gameDetails.hasError() ? View.VISIBLE : View.GONE, default=gone }"
-                    tools:visibility="visible"
-                    tools:text="error found"
-                    android:gravity="center"
-                    android:layout_width="match_parent"
+            <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_width="match_parent"
+                    android:visibility="@{state.gameMessages.success() ? View.VISIBLE : View.GONE, default=gone }"
+                    tools:visibility="visible"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/winner">
+
+                <EditText
+                        android:inputType="text"
+                        android:id="@+id/message_input"
+                        android:singleLine="true"
+                        android:layout_width="0dp"
+                        android:hint="@string/input_message"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        tools:ignore="Autofill"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                        app:layout_constraintTop_toBottomOf="@id/message_input"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:id="@+id/game_messages"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"
+                        app:stackFromEnd="true"
+                        app:reverseLayout="true"
+                        app:itemBinding="@{messagesbinding}"
+                        app:items="@{state.messages}"
+                        tools:itemCount="3"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/view_message_item"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

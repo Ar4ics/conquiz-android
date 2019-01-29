@@ -6,6 +6,7 @@
 
     <data>
         <import type="android.view.View" />
+        <import type="com.gizmodev.conquiz.model.AnswerVariant" />
 
         <variable
                 name="listener"
@@ -17,43 +18,47 @@
 
         <variable
                 name="variantsbinding"
-                type="me.tatarka.bindingcollectionadapter2.ItemBinding" />
+                type="me.tatarka.bindingcollectionadapter2.ItemBinding&lt;AnswerVariant&gt;" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
+            android:background="@color/white"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp">
         <TextView
-
                 android:id="@+id/question_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{state.question.title}"
-                android:textSize="20sp"
-                tools:text="@string/sample_question"
-                android:gravity="center"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
                 app:layout_constraintBottom_toTopOf="@id/variants"
-        />
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="@{state.question.title}"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:text="@string/sample_question"
+                android:gravity="center"/>
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/variants"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemBinding="@{variantsbinding}"
                 app:items="@{state.question.answers}"
                 tools:itemCount="4"
+                app:layout_constraintBottom_toTopOf="@id/exact_answer"
+                app:layout_constraintTop_toBottomOf="@id/question_title"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/view_variant_item"
-                app:layout_constraintTop_toBottomOf="@id/question_title"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:visibility="@{state.question.answers != null ? View.VISIBLE : View.GONE, default=gone }"
                 tools:visibility="visible"/>
 
-        <com.google.android.material.textfield.TextInputEditText
+        <EditText
+                android:inputType="number"
                 android:gravity="center"
                 android:id="@+id/exact_answer"
                 android:singleLine="true"
@@ -63,14 +68,16 @@
                 app:layout_constraintTop_toBottomOf="@id/variants"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/error"
                 android:visibility="@{state.question.answers == null ? View.VISIBLE : View.GONE, default=gone }"
-                tools:visibility="visible"
-        />
+                tools:visibility="gone"
+                tools:ignore="Autofill"/>
 
         <TextView
+                android:id="@+id/error"
                 android:text="@{state.gameQuestion.error()}"
                 android:visibility="@{state.gameQuestion.hasError() ? View.VISIBLE : View.GONE, default=gone }"
-                tools:visibility="visible"
+                tools:visibility="gone"
                 android:gravity="center"
                 tools:text="error found"
                 android:layout_width="match_parent"
@@ -80,5 +87,5 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
         />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </layout>

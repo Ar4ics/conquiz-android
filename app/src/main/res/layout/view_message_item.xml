@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="com.gizmodev.conquiz.utils.ColorPicker"/>
+        <import type="android.graphics.Color"/>
+
+        <variable
+                name="message"
+                type="com.gizmodev.conquiz.model.GameMessage"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:gravity="center">
+        <TextView
+                android:id="@+id/message_username"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/message_text"
+                app:layout_constraintEnd_toStartOf="@id/message_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@{message.user.name}"
+                tools:text="@tools:sample/lorem"/>
+        <TextView
+                android:id="@+id/message_text"
+                app:layout_constraintEnd_toStartOf="@id/message_date"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintTop_toBottomOf="@id/message_username"
+                app:layout_constraintStart_toStartOf="@id/message_username"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@{message.message}"
+                tools:text="@tools:sample/lorem"/>
+        <TextView
+                android:id="@+id/message_time"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/message_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintVertical_chainStyle="packed"
+                android:text="@{message.time}"
+                tools:text="@tools:sample/lorem"/>
+        <TextView
+                android:id="@+id/message_date"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/message_text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/message_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{message.date}"
+                tools:text="@tools:sample/lorem"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

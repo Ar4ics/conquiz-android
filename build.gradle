@@ -1,9 +1,9 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = "1.3.11"
-    ext.gradle_version = '3.5.0-alpha01'
-    ext.navigation_version = "1.0.0-alpha09"
+    ext.kotlin_version = "1.3.20"
+    ext.gradle_version = "3.5.0-alpha02"
+    ext.navigation_version = "1.0.0-alpha11"
     repositories {
         google()
         jcenter()
@@ -50,10 +50,10 @@ ext {
             constraint  : "2.0.0-alpha3",
             lifecycle   : "2.1.0-alpha01",
             retrofit    : "2.5.0",
-            okhttp      : "3.12.0",
-            leakcanary  : "1.6.2",
+            okhttp      : '3.12.1',
+            leakcanary  : '1.6.3',
             timber      : "4.7.1",
-            dagger      : "2.16",
+            dagger      : "2.21",
             rxjava      : "2.2.5",
             rxandroid   : "2.1.0",
             rxkotlin    : "2.3.0",

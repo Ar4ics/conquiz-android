@@ -58,7 +58,7 @@ class LoginFragment : AppFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentLoginPageBinding.inflate(inflater, container, false)
             .apply {
-                setLifecycleOwner(this@LoginFragment)
+                lifecycleOwner = this@LoginFragment
                 state = this@LoginFragment.vm.state
                 executePendingBindings()
             }
@@ -66,7 +66,7 @@ class LoginFragment : AppFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        vm.state.sign.observe(this, Observer {
+        vm.state.sign.observe(viewLifecycleOwner, Observer {
                 Timber.d("sign=$it")
                 if (it.success()) {
                     navController().navigate(LoginFragmentDirections.actionLoginPageToProfilePage())

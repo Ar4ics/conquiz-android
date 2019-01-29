@@ -1,5 +1,6 @@
 package com.gizmodev.conquiz.ui.games
 
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.gizmodev.conquiz.R
 import com.gizmodev.conquiz.model.Game
@@ -11,12 +12,15 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
+
+
 class GameListViewModel(
     private val gameApi: GameApi,
     private val gameHolder: GameHolder
 ) : AppViewModel() {
 
     val state = State()
+    val user = gameHolder.user
 
     init {
 //        launch {
@@ -29,6 +33,7 @@ class GameListViewModel(
 //                onError(e)
 //            }
 //        }
+
         state.setGamesLoading()
         gameApi.getGames()
             .subscribeOn(Schedulers.io())
@@ -37,6 +42,7 @@ class GameListViewModel(
                 { result ->
                     Timber.d("Games loaded: $result")
                     state.setGames(result.games)
+                    setFilteredGames(state.my.value ?: false, state.checkedButton.value ?: R.id.all)
                 },
                 { error ->
                     Timber.e("Failed to load games: ${error.localizedMessage}")
@@ -44,34 +50,38 @@ class GameListViewModel(
                 }
             )
             .untilCleared()
+
     }
 
-    fun setFilteredGames(my: Boolean?, checkedButton: Int?) {
+    fun setFilteredGames(my: Boolean, checkedButton: Int) {
         var filtered = state.games.value?.data
-        val user = gameHolder.user
         Timber.d("user = $user")
         Timber.d("my = $my, checkedButton = $checkedButton")
-        if (my != null && my == true) {
+        if (my) {
             filtered = filtered?.filter { it.user_colors.any { userColor -> userColor.user_id == user?.id } }
         }
-        if (checkedButton != null) {
-            if (checkedButton == R.id.second) {
-                filtered = filtered?.filter { !it.isFinished() }
-            }
-            if (checkedButton == R.id.third) {
-                filtered = filtered?.filter { it.isFinished() }
-            }
+        if (checkedButton == com.gizmodev.conquiz.R.id.current) {
+            filtered = filtered?.filter { !it.isFinished() }
+        }
+        if (checkedButton == com.gizmodev.conquiz.R.id.finished) {
+            filtered = filtered?.filter { it.isFinished() }
         }
         state.setFilteredGames(filtered)
     }
 
     class State {
         val games = MutableLiveData<Result<List<Game>>>()
+        val filteredGames = MutableLiveData<List<Game>>()
 
-        val filteredGames = MutableLiveData<List<Game>?>()
+        val checkedButton = MutableLiveData<Int>(R.id.all)
+        val my = MutableLiveData<Boolean>(false)
 
-        val checkedButton = MutableLiveData<Int>()
-        val my = MutableLiveData<Boolean>()
+        val liveDataMerger = MediatorLiveData<Any>()
+
+        init {
+            liveDataMerger.addSource(checkedButton) { value -> liveDataMerger.setValue(value) }
+            liveDataMerger.addSource(my) { value -> liveDataMerger.setValue(value) }
+        }
 
         fun setGamesError(throwable: Throwable) {
             games.value = Result(
@@ -83,7 +93,7 @@ class GameListViewModel(
 
         fun setGamesLoading() {
             games.value =
-                    Result(Result.Status.LOADING, null, null)
+                Result(Result.Status.LOADING, null, null)
         }
 
         fun setGames(gamesInfo: List<Game>?) {
@@ -92,8 +102,6 @@ class GameListViewModel(
                 gamesInfo,
                 null
             )
-            checkedButton.value = R.id.second
-            my.value = true
         }
 
         fun setFilteredGames(gamesInfo: List<Game>?) {

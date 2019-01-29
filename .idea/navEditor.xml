@@ -61,6 +61,11 @@
                         </option>
                         <option name="myPositions">
                           <map>
+                            <entry key="action_profile_page_to_list_games">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_profile_page_to_login_page">
                               <value>
                                 <LayoutPositions />
