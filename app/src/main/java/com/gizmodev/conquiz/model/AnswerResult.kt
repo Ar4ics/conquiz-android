@@ -23,10 +23,10 @@ data class AnswerVariant(val title: String, val value: Int, val is_correct: Bool
 
     @ColorInt
     fun getColor(): Int {
-        if (is_correct == null) {
-            return getPickedColor()
+        return if (is_correct == null) {
+            getPickedColor()
         } else {
-            return if (is_correct) Color.GREEN else Color.RED
+            if (is_correct) Color.GREEN else Color.RED
         }
     }
 

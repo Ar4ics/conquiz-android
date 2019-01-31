@@ -31,6 +31,9 @@ class ProfileFragment : AppFragment() {
         go_to_games.setOnClickListener {
             navController().navigate(ProfileFragmentDirections.actionProfilePageToListGames())
         }
+        create_game_btn.setOnClickListener {
+            navController().navigate(ProfileFragmentDirections.actionProfilePageToCreateGame())
+        }
     }
 
     override fun onDestroyView() {

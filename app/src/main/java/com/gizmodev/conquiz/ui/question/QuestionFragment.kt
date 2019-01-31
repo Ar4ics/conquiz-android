@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.gizmodev.conquiz.BR
 import com.gizmodev.conquiz.databinding.FragmentViewQuestionBinding
 import com.gizmodev.conquiz.model.AnswerVariant
-import com.gizmodev.conquiz.model.Question
 import com.gizmodev.conquiz.ui.core.AppDialogFragment
 import kotlinx.android.synthetic.main.fragment_view_question.*
 import me.tatarka.bindingcollectionadapter2.ItemBinding
@@ -27,14 +26,12 @@ class QuestionFragment : AppDialogFragment(), OnVariantClickListener {
     @Inject
     lateinit var vm: QuestionViewModel
 
-    lateinit var question: Question
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         Timber.d("savedInstanceState = $savedInstanceState")
-
-        question = QuestionFragmentArgs.fromBundle(arguments!!).question
+        if (savedInstanceState != null) return
+        val question = QuestionFragmentArgs.fromBundle(arguments!!).question
         vm.state.setQuestion(question)
     }
 
@@ -62,6 +59,11 @@ class QuestionFragment : AppDialogFragment(), OnVariantClickListener {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        setWindow()
+    }
+
     private fun setWindow() {
         val window = dialog!!.window!!
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
@@ -83,8 +85,6 @@ class QuestionFragment : AppDialogFragment(), OnVariantClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         Timber.d("view = $view, savedInstanceState = $savedInstanceState")
-
-        setWindow()
 
         variants.addItemDecoration(
             DividerItemDecoration(

@@ -77,11 +77,15 @@ class GameViewModel(
     private var clickedBox: Box? = null
 
     fun clickBox(box: Box) {
-        clickedBox = box
         val player = gameHolder.player
         val game = gameHolder.game
 
+        clickedBox = box
+
+
         if (player != null && game != null) {
+            state.replaceBox(box.copy(color = "gray"))
+
             gameApi.boxClick(game.id, box.x, box.y, player.id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -95,10 +99,10 @@ class GameViewModel(
     private fun onBoxClickSuccess(result: Response<ResponseBody>) {
         val response = result.body()?.string()
         Timber.d("success box click: $response")
-        if (response != null && !response.contains("error", ignoreCase = true)) {
+        if (response != null && response.contains("error", ignoreCase = true)) {
             val box = clickedBox
             box?.let {
-                state.replaceBox(box.copy(color = "gray"))
+                state.replaceBox(box)
             }
         }
     }
@@ -106,6 +110,10 @@ class GameViewModel(
     private fun onBoxClickError(error: Throwable) {
         Timber.e("failed to box click: ${error.localizedMessage}")
         state.setGameError(error)
+        val box = clickedBox
+        box?.let {
+            state.replaceBox(box)
+        }
     }
 
 

@@ -16,6 +16,15 @@ interface GameApi {
     fun getGame(@Path(value = "id", encoded = true) id: Int): Single<GameDetails>
 
     @FormUrlEncoded
+    @POST("games")
+    fun createGame(
+        @Field("title") title: String,
+        @Field("count_x") countX: Int,
+        @Field("count_y") countY: Int,
+        @Field("users[]") users: List<Int>
+    ): Single<Response<ResponseBody>>
+
+    @FormUrlEncoded
     @POST("games/{id}/base/box/clicked")
     fun boxClick(
         @Path(value = "id", encoded = true) id: Int,

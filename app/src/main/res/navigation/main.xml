@@ -13,6 +13,9 @@
                 android:id="@+id/action_profile_page_to_login_page"
                 app:destination="@id/login_page" />
         <action
+                android:id="@+id/action_profile_page_to_create_game"
+                app:destination="@id/create_game" />
+        <action
                 android:id="@+id/action_profile_page_to_list_games"
                 app:destination="@id/list_games" />
     </fragment>
@@ -24,6 +27,15 @@
         <action
                 android:id="@+id/action_login_page_to_profile_page"
                 app:destination="@id/profile_page" />
+    </fragment>
+    <fragment
+            android:id="@+id/create_game"
+            android:name="com.gizmodev.conquiz.ui.creategame.CreateGameFragment"
+            android:label="@string/nav_create_game"
+            tools:layout="@layout/fragment_create_game">
+        <action
+                android:id="@+id/action_create_game_to_list_games"
+                app:destination="@id/list_games" />
     </fragment>
     <fragment
             android:id="@+id/list_games"

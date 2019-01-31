@@ -5,12 +5,20 @@ import com.gizmodev.conquiz.R
 import com.gizmodev.conquiz.utils.Constants
 import com.pusher.client.Pusher
 import com.pusher.client.PusherOptions
+import com.pusher.client.channel.PresenceChannelEventListener
+import com.pusher.client.channel.User
 import com.pusher.client.connection.ConnectionEventListener
 import com.pusher.client.connection.ConnectionStateChange
 import com.pusher.client.util.HttpAuthorizer
 import timber.log.Timber
+import javax.inject.Singleton
 
-class PusherHolder(private val context: Context, private val authenticationInterceptor: AuthenticationInterceptor) {
+@Singleton
+class PusherHolder(
+    private val context: Context,
+    private val authenticationInterceptor: AuthenticationInterceptor,
+    private val gameHolder: GameHolder
+) {
 
     companion object {
         const val EventPrefix = "App\\Events\\"
@@ -50,6 +58,68 @@ class PusherHolder(private val context: Context, private val authenticationInter
         Timber.e("Cannot parse pusher json")
     }
 
+    fun connectPresence(gameId: Int) {
+        pusher?.subscribePresence("presence-users.$gameId", object : PresenceChannelEventListener {
+            override fun onEvent(channelName: String?, eventName: String?, data: String?) {
+
+            }
+
+            override fun onAuthenticationFailure(message: String?, e: Exception?) {
+                Timber.d("failed entering channel: $message $e")
+            }
+
+            override fun onSubscriptionSucceeded(channelName: String?) {
+                Timber.d("success entering channel: $channelName")
+            }
+
+            override fun onUsersInformationReceived(channelName: String?, users: MutableSet<User>?) {
+                Timber.d("users in channel: $users")
+
+                if (users == null) return
+                val us = mutableListOf<com.gizmodev.conquiz.model.User>()
+
+                for (user in users) {
+                    val info = Result.fromJson<com.gizmodev.conquiz.model.User>(user.info)
+                    if (info != null) {
+                        us.add(info)
+                    }
+                }
+
+                val old = gameHolder.onlineUsers.value
+                gameHolder.onlineUsers.value = old.plus(gameId to us)
+            }
+
+            override fun userSubscribed(channelName: String?, user: User?) {
+                Timber.d("user entered: $user")
+
+                if (user == null) return
+                val u = Result.fromJson<com.gizmodev.conquiz.model.User>(user.info)
+                val oldUsers = gameHolder.onlineUsers.value[gameId]?.toMutableList()
+                if (oldUsers != null && u != null) {
+                    oldUsers.add(u)
+                    gameHolder.onlineUsers.value = gameHolder.onlineUsers.value.plus(gameId to oldUsers)
+                }
+            }
+
+            override fun userUnsubscribed(channelName: String?, user: User?) {
+                Timber.d("user leaved: $user")
+
+                if (user == null) return
+                val u = Result.fromJson<com.gizmodev.conquiz.model.User>(user.info)
+                val oldUsers = gameHolder.onlineUsers.value[gameId]?.toMutableList()
+                if (oldUsers != null && u != null) {
+                    oldUsers.remove(u)
+                    gameHolder.onlineUsers.value = gameHolder.onlineUsers.value.plus(gameId to oldUsers)
+                }
+            }
+
+        })
+    }
+
+    fun disconnectPresence(gameId: Int) {
+        pusher?.unsubscribe("presence-users.$gameId")
+    }
+
     fun connect() {
         val auth =
             HttpAuthorizer("${Constants.REST_API_URL_HEROKU}${context.resources.getString(R.string.pusher_auth_endpoint)}")
@@ -59,8 +129,8 @@ class PusherHolder(private val context: Context, private val authenticationInter
         pusher = Pusher(context.resources.getString(R.string.pusher_key), options)
 
         pusher?.connect(object : ConnectionEventListener {
-            override fun onConnectionStateChange(change: ConnectionStateChange) {
-                Timber.d("State changed to ${change.currentState} from ${change.previousState}")
+            override fun onConnectionStateChange(change: ConnectionStateChange?) {
+                Timber.d("State changed to ${change?.currentState} from ${change?.previousState}")
             }
 
             override fun onError(message: String?, code: String?, e: Exception?) {

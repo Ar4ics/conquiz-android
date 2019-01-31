@@ -3,6 +3,7 @@ package com.gizmodev.conquiz.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.gizmodev.conquiz.ui.core.AppViewModelFactory
+import com.gizmodev.conquiz.ui.creategame.CreateGameModule
 import com.gizmodev.conquiz.ui.game.GameModule
 import com.gizmodev.conquiz.ui.games.GameListModule
 import com.gizmodev.conquiz.ui.login.LoginModule
@@ -17,7 +18,8 @@ import javax.inject.Provider
     GameModule::class,
     QuestionModule::class,
     LoginModule::class,
-    ProfileModule::class
+    ProfileModule::class,
+    CreateGameModule::class
 ])
 class UiModule {
 

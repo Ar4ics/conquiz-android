@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+        <import type="com.gizmodev.conquiz.utils.ColorPicker"/>
+
+        <variable
+                name="state"
+                type="com.gizmodev.conquiz.ui.creategame.CreateGameViewModel.State.PairUser"/>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <TextView
+                android:textSize="20sp"
+                android:padding="8dp"
+                android:id="@+id/username"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/checked"
+                app:layout_constraintBottom_toTopOf="@id/online"
+                android:layout_width="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@{state.user.name}"
+                tools:text="username"/>
+        <CheckBox
+                android:checked="@={state.checked}"
+                android:id="@+id/checked"
+                app:layout_constraintStart_toEndOf="@id/username"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        <TextView
+                android:padding="8dp"
+                android:id="@+id/online"
+                android:visibility="@{state.online ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@id/username"
+                app:layout_constraintEnd_toStartOf="@id/checked"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Сейчас онлайн"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

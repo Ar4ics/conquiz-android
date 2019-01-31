@@ -168,13 +168,13 @@ class GameFragment : AppFragment(), OnBoxClickListener {
         })
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onPause() {
+        super.onPause()
         val prev = fragmentManager?.findFragmentByTag("question")
         if (prev != null) {
             val df = prev as QuestionFragment
             Timber.d("QuestionFragment closing")
-            //df.dialog?.dismiss()
+            df.dismiss()
         }
     }
 
@@ -186,7 +186,6 @@ class GameFragment : AppFragment(), OnBoxClickListener {
             df.dialog?.hide()
         }
     }
-
 
     private fun showDialog(question: Question) {
         val prev = fragmentManager?.findFragmentByTag("question")

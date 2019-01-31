@@ -31,6 +31,9 @@ class QuestionViewModel(
         av = answerVariant
 
         if (player != null && game != null && question != null) {
+
+            state.setVariant(answerVariant.copy(picked = true))
+
             gameApi.questionAnswer(game.id, answerVariant.value, question.id, player.id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -45,18 +48,21 @@ class QuestionViewModel(
     private fun onAnswerSuccess(result: Response<ResponseBody>) {
         val response = result.body()?.string()
         Timber.d("success answer: $response")
-        if (response != null && !response.contains("error", ignoreCase = true)) {
+        if (response != null && response.contains("error", ignoreCase = true)) {
             val answerVariant = av
             answerVariant?.let {
-                state.setVariant(answerVariant.copy(picked = true))
+                state.setVariant(answerVariant.copy(picked = false))
             }
         }
     }
 
-
     private fun onAnswerError(throwable: Throwable) {
         Timber.e("failed to answer: ${throwable.localizedMessage}")
         state.setQuestionError(throwable)
+        val answerVariant = av
+        answerVariant?.let {
+            state.setVariant(answerVariant.copy(picked = false))
+        }
     }
 
     class State {

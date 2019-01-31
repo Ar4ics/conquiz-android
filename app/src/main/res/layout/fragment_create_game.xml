@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".ui.creategame.CreateGameFragment" android:id="@+id/layout4">
+
+    <data>
+        <import type="android.view.View"/>
+        <import type="com.gizmodev.conquiz.ui.creategame.CreateGameViewModel.State.PairUser"/>
+
+        <variable
+                name="listener"
+                type="com.gizmodev.conquiz.ui.creategame.CreateGameFragment"/>
+
+        <variable
+                name="state"
+                type="com.gizmodev.conquiz.ui.creategame.CreateGameViewModel.State"/>
+
+        <variable
+                name="usersbinding"
+                type="me.tatarka.bindingcollectionadapter2.ItemBinding&lt;PairUser&gt;"/>
+
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:padding="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <TextView
+                android:text="@{state.initialUsers.error()}"
+                android:visibility="@{state.initialUsers.hasError() ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"
+                tools:text="error found"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ProgressBar
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:id="@+id/progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="@{state.initialUsers.loading() ? View.VISIBLE : View.GONE, default=gone }"
+                tools:visibility="visible"/>
+
+
+        <EditText
+                android:hint="@string/game_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:text="@={state.gameTitle}"
+                android:singleLine="true"
+                android:ems="10"
+                android:id="@+id/gameTitle" android:layout_marginTop="8dp"
+                app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="8dp"
+                app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toEndOf="parent" android:layout_marginRight="8dp"
+                tools:ignore="Autofill"/>
+
+        <EditText
+                android:text='@={state.countX}'
+                android:hint="Длина поля"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:singleLine="true"
+                android:id="@+id/gameX"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/gameTitle"
+                tools:ignore="Autofill"/>
+        <EditText
+                android:text='@={state.countY}'
+                android:hint="Ширина поля"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:singleLine="true"
+                android:id="@+id/gameY"
+                app:layout_constraintTop_toBottomOf="@+id/gameX"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:ignore="Autofill"/>
+
+        <TextView
+                android:id="@+id/help_text"
+                app:layout_constraintTop_toBottomOf="@+id/gameY"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="Выберите игроков (от 1-го до 3-х)"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        <androidx.recyclerview.widget.RecyclerView
+                app:itemBinding="@{usersbinding}"
+                app:items="@{state.users}"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:id="@+id/users_rv"
+                app:layout_constraintTop_toBottomOf="@+id/help_text"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+        />
+        <Button
+                android:onClick="@{() -> listener.createGame()}"
+                android:text="@string/create_game"
+                android:layout_width="wrap_content"
+                android:layout_height="47dp"
+                android:id="@+id/createGame"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/users_rv"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

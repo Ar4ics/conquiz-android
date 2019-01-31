@@ -35,4 +35,8 @@
     <string name="game_status">Завершена</string>
     <string name="go_to_games_list">Перейти к играм</string>
     <string name="input_message">Введите сообщение</string>
+    <string name="create_game">Создать игру</string>
+    <string name="game_title">Название игры</string>
+    <string name="nav_create_game">Создание игры</string>
+    <string name="go_to_create_game">Создать игру</string>
 </resources>

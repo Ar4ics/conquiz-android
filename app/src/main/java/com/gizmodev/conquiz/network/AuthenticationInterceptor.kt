@@ -14,8 +14,8 @@ class AuthenticationInterceptor @Inject constructor() : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val original = chain.request()
         val builder = original.newBuilder()
-        builder.header("Accept", "application/json");
-        Timber.d("token=$token")
+        builder.header("Accept", "application/json")
+        Timber.d("token = $token")
         if (token != null) {
             builder.header("Authorization", "Bearer $token")
         }
