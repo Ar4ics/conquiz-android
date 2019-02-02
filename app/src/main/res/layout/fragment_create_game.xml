@@ -59,39 +59,41 @@
                 android:inputType="textPersonName"
                 android:text="@={state.gameTitle}"
                 android:singleLine="true"
-                android:ems="10"
-                android:id="@+id/gameTitle" android:layout_marginTop="8dp"
-                app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="8dp"
-                app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="8dp"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintEnd_toEndOf="parent" android:layout_marginRight="8dp"
+                android:ems="12"
+                android:id="@+id/gameTitle"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/gameX"
                 tools:ignore="Autofill"/>
 
         <EditText
                 android:text='@={state.countX}'
-                android:hint="Длина поля"
+                android:hint="Длина поля (от 3 до 12)"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:ems="10"
+                android:ems="12"
                 android:singleLine="true"
                 android:id="@+id/gameX"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/gameTitle"
+                app:layout_constraintBottom_toTopOf="@id/gameY"
                 tools:ignore="Autofill"/>
         <EditText
                 android:text='@={state.countY}'
-                android:hint="Ширина поля"
+                android:hint="Ширина поля (от 3 до 12)"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:ems="10"
+                android:ems="12"
                 android:singleLine="true"
                 android:id="@+id/gameY"
                 app:layout_constraintTop_toBottomOf="@+id/gameX"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/help_text"
                 tools:ignore="Autofill"/>
 
         <TextView
@@ -99,19 +101,23 @@
                 app:layout_constraintTop_toBottomOf="@+id/gameY"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/users_rv"
                 android:text="Выберите игроков (от 1-го до 3-х)"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
+
         <androidx.recyclerview.widget.RecyclerView
                 app:itemBinding="@{usersbinding}"
                 app:items="@{state.users}"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="0dp"
+                android:layout_margin="8dp"
                 android:id="@+id/users_rv"
                 app:layout_constraintTop_toBottomOf="@+id/help_text"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/createGame"
         />
         <Button
                 android:onClick="@{() -> listener.createGame()}"
@@ -119,6 +125,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="47dp"
                 android:id="@+id/createGame"
+                android:layout_marginBottom="32dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"

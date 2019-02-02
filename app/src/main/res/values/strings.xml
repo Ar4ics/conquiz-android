@@ -39,4 +39,9 @@
     <string name="game_title">Название игры</string>
     <string name="nav_create_game">Создание игры</string>
     <string name="go_to_create_game">Создать игру</string>
+    <string name="my_games">Мои игры</string>
+    <string name="finished_games">Завершенные</string>
+    <string name="current_games">Текущие</string>
+    <string name="all_games">Все</string>
+    <string name="count_online_users">Сейчас онлайн 1 человек</string>
 </resources>

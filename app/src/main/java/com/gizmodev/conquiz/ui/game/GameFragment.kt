@@ -35,7 +35,6 @@ class GameFragment : AppFragment(), OnBoxClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.d("savedInstanceState = $savedInstanceState")
         if (savedInstanceState != null) return
         val game = GameFragmentArgs.fromBundle(arguments!!).game
         vm.loadGame(game)

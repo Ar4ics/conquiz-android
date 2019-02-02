@@ -2,10 +2,12 @@ package com.gizmodev.conquiz.ui.games
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.gizmodev.conquiz.R
 import com.gizmodev.conquiz.model.Game
 import com.gizmodev.conquiz.network.GameApi
 import com.gizmodev.conquiz.network.GameHolder
+import com.gizmodev.conquiz.network.PusherHolder
 import com.gizmodev.conquiz.network.Result
 import com.gizmodev.conquiz.ui.core.AppViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -16,11 +18,13 @@ import timber.log.Timber
 
 class GameListViewModel(
     private val gameApi: GameApi,
-    private val gameHolder: GameHolder
+    private val gameHolder: GameHolder,
+    private val pusherHolder: PusherHolder
 ) : AppViewModel() {
 
     val state = State()
     val user = gameHolder.user
+    val room = 0
 
     init {
 //        launch {
@@ -51,6 +55,21 @@ class GameListViewModel(
             )
             .untilCleared()
 
+        state.onlineUsers.postValue(gameHolder.onlineUsers.value[room])
+
+        gameHolder.onlineUsers.observable.subscribe {
+            Timber.d("online users: $it")
+            val users = it[room]
+            state.onlineUsers.postValue(users)
+        }.untilCleared()
+
+        pusherHolder.connectPresence(room)
+
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        pusherHolder.disconnectPresence(room)
     }
 
     fun setFilteredGames(my: Boolean, checkedButton: Int) {
@@ -106,6 +125,11 @@ class GameListViewModel(
 
         fun setFilteredGames(gamesInfo: List<Game>?) {
             filteredGames.value = gamesInfo
+        }
+
+        val onlineUsers = MutableLiveData<List<com.gizmodev.conquiz.model.User>?>()
+        val onlineUsersCount = Transformations.map(onlineUsers) { list ->
+            list?.count() ?: 0
         }
     }
 }

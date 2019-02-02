@@ -74,5 +74,4 @@ class LoginFragment : AppFragment() {
             })
         view.findViewById<SignInButton>(R.id.sign_in_button).setOnClickListener { onLogin() }
     }
-
 }

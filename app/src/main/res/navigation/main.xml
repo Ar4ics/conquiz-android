@@ -34,6 +34,8 @@
             android:label="@string/nav_create_game"
             tools:layout="@layout/fragment_create_game">
         <action
+                app:popUpTo="@id/create_game"
+                app:popUpToInclusive="true"
                 android:id="@+id/action_create_game_to_list_games"
                 app:destination="@id/list_games" />
     </fragment>

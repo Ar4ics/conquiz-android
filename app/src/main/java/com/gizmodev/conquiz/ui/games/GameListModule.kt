@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.gizmodev.conquiz.network.GameApi
 import com.gizmodev.conquiz.network.GameHolder
+import com.gizmodev.conquiz.network.PusherHolder
 import com.gizmodev.conquiz.ui.core.ViewModelKey
 import dagger.Module
 import dagger.Provides
@@ -29,9 +30,10 @@ abstract class GameListModule {
         @ViewModelKey(GameListViewModel::class)
         fun provideGameListViewModel(
             gameApi: GameApi,
-            gameHolder: GameHolder
+            gameHolder: GameHolder,
+            pusherHolder: PusherHolder
         ): ViewModel =
-            GameListViewModel(gameApi, gameHolder)
+            GameListViewModel(gameApi, gameHolder, pusherHolder)
     }
 
     @Module

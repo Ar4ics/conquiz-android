@@ -6,10 +6,8 @@ import com.gizmodev.conquiz.model.UserLogin
 import com.gizmodev.conquiz.network.*
 import com.gizmodev.conquiz.ui.core.AppViewModel
 import com.gizmodev.conquiz.utils.SharedPrefStorage
-import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
@@ -92,18 +90,20 @@ class ProfileViewModel(
     }
 
     private fun loadPusher() {
-        Completable.create {
+        Observable.fromCallable {
             pusherHolder.connect()
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
+            .subscribe(
+                {
                     Timber.d("pusher loaded")
+
                 },
-                onError = { error ->
+                { error ->
                     Timber.e("pusher error load: $error")
                     state.setSignedOut(error)
+
                 }
             ).untilCleared()
     }
@@ -176,7 +176,7 @@ class ProfileViewModel(
 
         fun setSigningIn() {
             user.value =
-                    Result(Result.Status.LOADING, null, null)
+                Result(Result.Status.LOADING, null, null)
         }
 
         fun setSignedIn(userLogin: UserLogin) {

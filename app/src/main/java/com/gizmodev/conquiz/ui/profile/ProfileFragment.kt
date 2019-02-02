@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import com.gizmodev.conquiz.databinding.FragmentProfilePageBinding
 import com.gizmodev.conquiz.ui.core.AppFragment
 import kotlinx.android.synthetic.main.fragment_profile_page.*
-import timber.log.Timber
 import javax.inject.Inject
 
 class ProfileFragment : AppFragment() {
@@ -34,16 +33,6 @@ class ProfileFragment : AppFragment() {
         create_game_btn.setOnClickListener {
             navController().navigate(ProfileFragmentDirections.actionProfilePageToCreateGame())
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        Timber.d("view destroyed")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Timber.d("destroyed")
     }
 
     private fun goLogin() {

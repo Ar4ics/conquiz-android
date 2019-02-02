@@ -19,17 +19,16 @@ class CreateGameViewModel(
 
     val state = State()
     private val room = 0
-    private var subscription: Boolean = false
 
     init {
 
         gameHolder.onlineUsers.observable.subscribe {
             Timber.d("online users: $it")
             val users = it[room]
-            if (users != null) {
-                state.setOnlineUsers(users)
-            }
+            state.setOnlineUsers(users)
         }.untilCleared()
+
+        pusherHolder.connectPresence(0)
 
         state.setUsersLoading()
         gameApi.getGames()
@@ -39,13 +38,13 @@ class CreateGameViewModel(
                 { result ->
                     Timber.d("Users loaded: ${result.users}")
                     state.setUsers(result.users)
-                    pusherHolder.connectPresence(room)
-                    subscription = true
+                    val ou = gameHolder.onlineUsers.value[room]
+                    Timber.d("online users: $ou")
+                    state.setOnlineUsers(ou)
                 },
                 { error ->
                     Timber.e("Failed to load users: ${error.localizedMessage}")
                     state.setUsersError(error)
-                    subscription = false
                 }
             )
             .untilCleared()
@@ -53,10 +52,9 @@ class CreateGameViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        if (subscription) {
-            pusherHolder.disconnectPresence(room)
-        }
+        pusherHolder.disconnectPresence(0)
     }
+
 
     fun createGame(title: String, countX: Int, countY: Int, users: List<Int>) {
         gameApi.createGame(title, countX, countY, users)
@@ -104,16 +102,16 @@ class CreateGameViewModel(
                 iu,
                 null
             )
-            users.postValue(iu.map { State.PairUser(it) })
+            users.value = iu.map { State.PairUser(it) }
         }
 
-        fun setOnlineUsers(onlineUsers: List<User>) {
+        fun setOnlineUsers(onlineUsers: List<User>?) {
 
             val old = users.value?.toMutableList()
 
             if (old != null){
                 for ((index, u) in old.withIndex()) {
-                    if (onlineUsers.find { it.id == u.user.id} != null) {
+                    if (onlineUsers?.find { it.id == u.user.id} != null) {
                         old[index] = old[index].copy(online = true)
                     } else {
                         old[index] = old[index].copy(online = false)

@@ -1,7 +1,6 @@
 package com.gizmodev.conquiz.network
 
 import android.content.Context
-import com.gizmodev.conquiz.R
 import com.gizmodev.conquiz.utils.Constants
 import com.pusher.client.Pusher
 import com.pusher.client.PusherOptions
@@ -12,6 +11,7 @@ import com.pusher.client.connection.ConnectionStateChange
 import com.pusher.client.util.HttpAuthorizer
 import timber.log.Timber
 import javax.inject.Singleton
+
 
 @Singleton
 class PusherHolder(
@@ -59,6 +59,8 @@ class PusherHolder(
     }
 
     fun connectPresence(gameId: Int) {
+        val channel = pusher?.getPresenceChannel("presence-users.$gameId")
+        if (channel != null && channel.isSubscribed) return
         pusher?.subscribePresence("presence-users.$gameId", object : PresenceChannelEventListener {
             override fun onEvent(channelName: String?, eventName: String?, data: String?) {
 
@@ -73,7 +75,7 @@ class PusherHolder(
             }
 
             override fun onUsersInformationReceived(channelName: String?, users: MutableSet<User>?) {
-                Timber.d("users in channel: $users")
+                Timber.d("users in channel $channelName: $users")
 
                 if (users == null) return
                 val us = mutableListOf<com.gizmodev.conquiz.model.User>()
@@ -90,7 +92,7 @@ class PusherHolder(
             }
 
             override fun userSubscribed(channelName: String?, user: User?) {
-                Timber.d("user entered: $user")
+                Timber.d("user entered in $channelName: $user")
 
                 if (user == null) return
                 val u = Result.fromJson<com.gizmodev.conquiz.model.User>(user.info)
@@ -102,7 +104,7 @@ class PusherHolder(
             }
 
             override fun userUnsubscribed(channelName: String?, user: User?) {
-                Timber.d("user leaved: $user")
+                Timber.d("user leaved from $channelName: $user")
 
                 if (user == null) return
                 val u = Result.fromJson<com.gizmodev.conquiz.model.User>(user.info)
@@ -122,11 +124,12 @@ class PusherHolder(
 
     fun connect() {
         val auth =
-            HttpAuthorizer("${Constants.REST_API_URL_HEROKU}${context.resources.getString(R.string.pusher_auth_endpoint)}")
+            HttpAuthorizer("${Constants.REST_API_URL_HEROKU}${context.resources.getString(com.gizmodev.conquiz.R.string.pusher_auth_endpoint)}")
         auth.setHeaders(mapOf("Authorization" to "Bearer ${authenticationInterceptor.token}"))
         val options =
-            PusherOptions().setCluster(context.resources.getString(R.string.pusher_cluster)).setAuthorizer(auth)
-        pusher = Pusher(context.resources.getString(R.string.pusher_key), options)
+            PusherOptions().setCluster(context.resources.getString(com.gizmodev.conquiz.R.string.pusher_cluster))
+                .setAuthorizer(auth)
+        pusher = Pusher(context.resources.getString(com.gizmodev.conquiz.R.string.pusher_key), options)
 
         pusher?.connect(object : ConnectionEventListener {
             override fun onConnectionStateChange(change: ConnectionStateChange?) {

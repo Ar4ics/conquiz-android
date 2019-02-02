@@ -29,7 +29,6 @@ class QuestionFragment : AppDialogFragment(), OnVariantClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Timber.d("savedInstanceState = $savedInstanceState")
         if (savedInstanceState != null) return
         val question = QuestionFragmentArgs.fromBundle(arguments!!).question
         vm.state.setQuestion(question)
@@ -83,8 +82,6 @@ class QuestionFragment : AppDialogFragment(), OnVariantClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        Timber.d("view = $view, savedInstanceState = $savedInstanceState")
 
         variants.addItemDecoration(
             DividerItemDecoration(

@@ -57,16 +57,6 @@ class GameListFragment : AppFragment(), OnGameClickListener {
 
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        Timber.d("view destroyed")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Timber.d("destroyed")
-    }
-
     override fun onGameClicked(game: Game) {
         navController().navigate(GameListFragmentDirections.actionListGamesToViewGame(game))
     }
