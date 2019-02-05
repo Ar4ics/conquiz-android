@@ -41,8 +41,10 @@
 
             <TextView
                     android:textSize="16sp"
-                    android:text="@{`Сейчас онлайн ` + state.onlineUsersCount + ` человек`}"
+                    android:text="@{`Онлайн ` + state.onlineUsersCount + ` человек`}"
                     tools:text="@string/count_online_users"
+                    android:visibility="@{state.onlineUsersCount != null ? View.VISIBLE : View.GONE, default=gone }"
+                    tools:visibility="visible"
                     android:gravity="center"
                     android:layout_gravity="center"
                     android:id="@+id/online_users_count"

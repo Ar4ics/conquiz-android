@@ -17,6 +17,7 @@
             android:padding="8dp"
             android:gravity="center">
         <TextView
+                android:textSize="16sp"
                 android:id="@+id/message_username"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -27,6 +28,7 @@
                 android:text="@{message.user.name}"
                 tools:text="@tools:sample/lorem"/>
         <TextView
+                android:textSize="16sp"
                 android:id="@+id/message_text"
                 app:layout_constraintEnd_toStartOf="@id/message_date"
                 app:layout_constraintVertical_chainStyle="packed"

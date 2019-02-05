@@ -15,9 +15,6 @@ interface LoginApi {
         @Field("code") code: String
     ): Single<Response<Any>>
 
-    @GET("auth/refresh")
-    fun refreshToken(): Single<Response<Any>>
-
     @GET("auth/user")
     fun getUser(): Single<UserLogin>
 

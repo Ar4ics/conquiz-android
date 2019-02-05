@@ -64,7 +64,7 @@ class CreateGameFragment : AppFragment() {
         val title = vm.state.gameTitle.value
 
         if (users != null && title != null && countX != null && countY != null &&
-            (users.count() in 1..3) && (countX in 3..12) && (countY in 3..12)) {
+            (users.count() in 1..3) && (countX in 2..5) && (countY in 2..5)) {
             vm.createGame(title, countX, countY, users)
         } else {
             Toast.makeText(context, "Проверьте параметры игры", Toast.LENGTH_SHORT).show()

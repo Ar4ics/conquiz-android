@@ -9,7 +9,7 @@ import com.gizmodev.conquiz.network.PusherHolder
 import com.gizmodev.conquiz.network.Result
 import com.gizmodev.conquiz.ui.core.AppViewModel
 import com.gizmodev.conquiz.utils.DateTimePicker
-import com.gizmodev.conquiz.utils.DoubleTrigger
+import com.gizmodev.conquiz.utils.EventBus
 import com.gizmodev.conquiz.utils.toString
 import com.pusher.client.channel.ChannelEventListener
 import io.reactivex.Completable
@@ -29,24 +29,42 @@ class GameViewModel(
 ) : AppViewModel() {
 
     val state = State()
-    fun loadGame(game: Game) {
-        gameHolder.game = game
-        state.setGameLoading()
-        gameApi.getGame(game.id)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { result -> onRetrieveGameSuccess(result) },
-                { error -> onRetrieveGameError(error) }
-            ).untilCleared()
-        state.setGameMessagesLoading()
-        gameApi.getGameMessages(game.id)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { result -> onRetrieveGameMessagesSuccess(result) },
-                { error -> onRetrieveGameMessagesError(error) }
-            ).untilCleared()
+    val game = gameHolder.game
+
+    init {
+        if (game != null) {
+            state.setGameLoading()
+            loadPusher()
+            gameApi.getGame(game.id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { result -> onRetrieveGameSuccess(result) },
+                    { error -> onRetrieveGameError(error) }
+                ).untilCleared()
+            state.setGameMessagesLoading()
+            gameApi.getGameMessages(game.id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { result -> onRetrieveGameMessagesSuccess(result) },
+                    { error -> onRetrieveGameMessagesError(error) }
+                ).untilCleared()
+
+            EventBus.subscribe<List<Box>>()
+                .subscribe {
+                    Timber.d("List<Box> received: $it")
+                    state.removeBoxes(it)
+                }.untilCleared()
+
+            EventBus.subscribe<Box>()
+                .subscribe {
+                    Timber.d("Box received: $it")
+                    state.replaceBox(it)
+                }.untilCleared()
+        } else {
+            Timber.e("game $game not found")
+        }
     }
 
     private fun onRetrieveGameMessagesError(throwable: Throwable) {
@@ -139,9 +157,10 @@ class GameViewModel(
         Timber.e("failed to send message: ${error.localizedMessage}")
     }
 
-    fun loadPusher() {
+    private fun loadPusher() {
         val id = gameHolder.game?.id ?: return
-        pusherHolder.pusher?.subscribe(
+        val pusher = pusherHolder.pusher ?: return
+        pusher.subscribe(
             "game.$id",
             object : ChannelEventListener {
                 override fun onSubscriptionSucceeded(channelName: String?) {
@@ -163,72 +182,6 @@ class GameViewModel(
                                 pusherHolder.errorParsingJson()
                             }
                         }
-                        PusherHolder.AnswersResults -> {
-                            val answersResults = Result.fromJson<AnswerResults>(data)
-                            Timber.d("AnswerResults: $answersResults")
-                            if (answersResults != null) {
-                                state.answerResults.postValue(answersResults)
-                                state.removeBoxes(answersResults.deleted_boxes)
-                                Timber.d("start delay: ${DateTimePicker.getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss")}")
-                                Completable
-                                    .timer(3, TimeUnit.SECONDS)
-                                    .subscribeBy(
-                                        onComplete = {
-                                            state.setQuestion(null)
-                                            Timber.d("complete delay: ${DateTimePicker.getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss")}")
-                                        },
-                                        onError = {
-                                            Timber.e("error delay: ${it.localizedMessage}")
-                                        }
-                                    )
-                            } else {
-                                pusherHolder.errorParsingJson()
-                            }
-                        }
-                        PusherHolder.CorrectAnswers -> {
-                            val correctAnswers = Result.fromJson<CorrectAnswerResults>(data)
-                            Timber.d("CorrectAnswerResults: $correctAnswers")
-                            if (correctAnswers != null) {
-                                state.answerResults.postValue(AnswerResults(correctAnswers.results, correctAnswers.correct, listOf()))
-                                Timber.d("start delay: ${DateTimePicker.getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss")}")
-                                state.showExactQuestion.postValue(false)
-                                Completable
-                                    .timer(3, TimeUnit.SECONDS)
-                                    .subscribeBy(
-                                        onComplete = {
-                                            state.showExactQuestion.postValue(true)
-                                            Timber.d("complete delay: ${DateTimePicker.getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss")}")
-                                        },
-                                        onError = {
-                                            Timber.e("error delay: ${it.localizedMessage}")
-                                        }
-                                    )
-                            } else {
-                                pusherHolder.errorParsingJson()
-                            }
-                        }
-                        PusherHolder.CompetitiveAnswerResults -> {
-                            val competitiveAnswerResults = Result.fromJson<CompetitiveAnswerResults>(data)
-                            Timber.d("CompetitiveAnswerResults: $competitiveAnswerResults")
-                            if (competitiveAnswerResults != null) {
-                                state.competitiveAnswerResults.postValue(competitiveAnswerResults)
-                                state.replaceBox(competitiveAnswerResults.result_box)
-                                Timber.d("start delay: ${DateTimePicker.getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss")}")
-                                Completable
-                                    .timer(3, TimeUnit.SECONDS)
-                                    .subscribeBy(
-                                        onComplete = {
-                                            state.setQuestion(null)
-                                            Timber.d("complete delay: ${DateTimePicker.getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss")}")
-                                        },
-                                        onError = {
-                                            Timber.e("error delay: ${it.localizedMessage}")
-                                        }
-                                    )
-                            } else {
-                                pusherHolder.errorParsingJson()
-                            }
-                        }
                         PusherHolder.WhoMoves -> {
                             val whoMoves = Result.fromJson<WhoMoves>(data)
                             Timber.d("whoMoves: $whoMoves")
@@ -243,16 +196,6 @@ class GameViewModel(
                             Timber.d("whoAttack: $whoAttack")
                             if (whoAttack != null) {
                                 state.setCompetitiveBox(whoAttack.competitive_box)
-                            } else {
-                                pusherHolder.errorParsingJson()
-                            }
-                        }
-                        PusherHolder.NewQuestion, PusherHolder.NewExactQuestion -> {
-                            val question = Result.fromJson<Question>(data)
-                            Timber.d("question: $question")
-                            if (question != null) {
-                                state.setQuestion(question)
-                                gameHolder.question = question
                             } else {
                                 pusherHolder.errorParsingJson()
                             }
@@ -284,6 +227,74 @@ class GameViewModel(
                                 pusherHolder.errorParsingJson()
                             }
                         }
+                        PusherHolder.AnswersResults -> {
+                            val answersResults = Result.fromJson<AnswerResults>(data)
+                            Timber.d("AnswerResults: $answersResults")
+                            if (answersResults != null) {
+                                state.answerResults.postValue(answersResults)
+                                Timber.d("start delay: ${DateTimePicker.getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss")}")
+                                Completable
+                                    .timer(3, TimeUnit.SECONDS)
+                                    .subscribeBy(
+                                        onComplete = {
+                                            state.setQuestion(null)
+                                            state.removeBoxes(answersResults.deleted_boxes)
+                                            Timber.d("complete delay: ${DateTimePicker.getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss")}")
+                                        },
+                                        onError = {
+                                            Timber.e("error delay: ${it.localizedMessage}")
+                                        }
+                                    ).untilCleared()
+                            } else {
+                                pusherHolder.errorParsingJson()
+                            }
+                        }
+                        PusherHolder.CorrectAnswers -> {
+                            val correctAnswers = Result.fromJson<CorrectAnswerResults>(data)
+                            Timber.d("CorrectAnswerResults: $correctAnswers")
+                            if (correctAnswers != null) {
+                                state.answerResults.postValue(
+                                    AnswerResults(
+                                        correctAnswers.results,
+                                        correctAnswers.correct,
+                                        listOf()
+                                    )
+                                )
+                            }
+                        }
+                        PusherHolder.CompetitiveAnswerResults -> {
+                            val competitiveAnswerResults = Result.fromJson<CompetitiveAnswerResults>(data)
+                            Timber.d("CompetitiveAnswerResults: $competitiveAnswerResults")
+                            if (competitiveAnswerResults != null) {
+                                state.competitiveAnswerResults.postValue(competitiveAnswerResults)
+                                Timber.d("start delay: ${DateTimePicker.getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss")}")
+                                Completable
+                                    .timer(3, TimeUnit.SECONDS)
+                                    .subscribeBy(
+                                        onComplete = {
+                                            state.setQuestion(null)
+                                            state.setCompetitiveBox(null)
+                                            state.replaceBoxes(competitiveAnswerResults)
+                                            Timber.d("complete delay: ${DateTimePicker.getCurrentDateTime().toString("yyyy/MM/dd HH:mm:ss")}")
+                                        },
+                                        onError = {
+                                            Timber.e("error delay: ${it.localizedMessage}")
+                                        }
+                                    ).untilCleared()
+                            } else {
+                                pusherHolder.errorParsingJson()
+                            }
+                        }
+                        PusherHolder.NewQuestion, PusherHolder.NewExactQuestion -> {
+                            val question = Result.fromJson<Question>(data)
+                            Timber.d("question: $question")
+                            gameHolder.question = question
+                            if (question != null) {
+                                state.setQuestion(question)
+                            } else {
+                                pusherHolder.errorParsingJson()
+                            }
+                        }
                     }
                 }
             },
@@ -305,7 +316,8 @@ class GameViewModel(
     override fun onCleared() {
         super.onCleared()
         val id = gameHolder.game?.id ?: return
-        pusherHolder.pusher?.unsubscribe("game.$id")
+        val pusher = pusherHolder.pusher ?: return
+        pusher.unsubscribe("game.$id")
         pusherHolder.disconnectPresence(id)
     }
 
@@ -316,14 +328,12 @@ class GameViewModel(
         val question = MutableLiveData<Question?>()
         val whoMoves = MutableLiveData<UserColor?>()
         val winner = MutableLiveData<UserColor?>()
+        val competitiveBox = MutableLiveData<CompetitiveBox?>()
         val answerResults = MutableLiveData<AnswerResults>()
         val competitiveAnswerResults = MutableLiveData<CompetitiveAnswerResults>()
 
-        val showExactQuestion = MutableLiveData<Boolean>()
-        val exactQuestion = Transformations.map(DoubleTrigger(question, showExactQuestion)) {
-            val q = it.first
-            val showExactQuestion = it.second
-            q != null && q.is_exact_answer && (showExactQuestion != null && showExactQuestion || showExactQuestion == null)
+        fun setQuestion(q: Question?) {
+            question.postValue(q)
         }
 
         val whoMovesName = Transformations.map(whoMoves) {
@@ -342,19 +352,41 @@ class GameViewModel(
             }
         }
 
-        fun setCompetitiveBox(competitiveBox: CompetitiveBox?) {
-            val oldField = field.value?.toMutableList()
-            if (oldField != null) {
-                if (competitiveBox != null) {
-                    val oldBox = oldField.find { it.x == competitiveBox.x && it.y == competitiveBox.y }
-                    val oldBoxIndex = oldField.indexOfFirst { it.x == competitiveBox.x && it.y == competitiveBox.y }
-                    if (oldBoxIndex != -1 && oldBox != null) {
-                        oldField[oldBoxIndex] = oldBox.copy(color = "gray")
-                        Timber.d("oldField: $oldField")
-                        field.postValue(oldField)
-                    } else {
-                        Timber.e("oldField error")
+        val competitiveTitle = Transformations.map(competitiveBox) {
+            var title = ""
+            if (it != null) {
+                if (it.competitors == null || it.competitors.isEmpty()) {
+                    title = "Разделение территории"
+                } else {
+                    val players = players.value
+                    val c1 = players?.find { p -> p.id == it.competitors[0] }
+                    val c2 = players?.find { p -> p.id == it.competitors[1] }
+                    if (c1 != null && c2 != null) {
+                        title = "${c1.user.name} нападает на ${c2.user.name}"
                     }
+                }
+            } else {
+                title = "Захват территории"
+            }
+            Timber.d("title: $title")
+            title
+        }
+
+        fun setCompetitiveBox(competitiveBox: CompetitiveBox?) {
+
+            this.competitiveBox.postValue(competitiveBox)
+            Timber.d("competitiveBox: $competitiveBox")
+
+            if (competitiveBox != null) {
+                val oldField = field.value?.toMutableList() ?: return
+                val oldBox = oldField.find { it.x == competitiveBox.x && it.y == competitiveBox.y }
+                val oldBoxIndex = oldField.indexOfFirst { it.x == competitiveBox.x && it.y == competitiveBox.y }
+                if (oldBoxIndex != -1 && oldBox != null) {
+                    oldField[oldBoxIndex] = oldBox.copy(color = "gray")
+                    Timber.d("oldField: $oldField")
+                    field.postValue(oldField)
+                } else {
+                    Timber.e("oldField error")
                 }
             }
         }
@@ -396,13 +428,6 @@ class GameViewModel(
             whoMoves.postValue(userColor)
         }
 
-        fun setQuestion(q: Question?) {
-            if (question.value != null && q != null) {
-                showExactQuestion.postValue(false)
-            }
-            question.postValue(q)
-        }
-
         fun setPlayers(userColors: List<UserColor>) {
             players.postValue(userColors)
         }
@@ -421,7 +446,7 @@ class GameViewModel(
 
         fun setGameLoading() {
             gameDetails.value =
-                    Result(Result.Status.LOADING, null, null)
+                Result(Result.Status.LOADING, null, null)
         }
 
 
@@ -432,11 +457,11 @@ class GameViewModel(
                 null
             )
             field.value = game.field.flatten()
+            setQuestion(game.question)
             setWhoMoves(game.who_moves)
             setPlayers(game.user_colors)
             setWinner(game.winner)
             setCompetitiveBox(game.competitive_box)
-            setQuestion(game.question)
         }
 
 
@@ -476,6 +501,35 @@ class GameViewModel(
             if (m != null) {
                 m.add(gm)
                 messages.postValue(m)
+            }
+        }
+
+        fun replaceBoxes(competitiveAnswerResults: CompetitiveAnswerResults) {
+            val targetBox = competitiveAnswerResults.result_box
+            val winner = competitiveAnswerResults.winner
+            val oldField = field.value?.toMutableList()
+            if (oldField != null) {
+                val oldBox = oldField.find { it.x == targetBox.x && it.y == targetBox.y }
+                val oldBoxIndex = oldField.indexOfFirst { it.x == targetBox.x && it.y == targetBox.y }
+                if (oldBoxIndex != -1 && oldBox != null) {
+                    oldField[oldBoxIndex] = targetBox
+                } else {
+                    Timber.e("oldField error")
+                }
+                if (winner != null &&
+                    targetBox.loss_user_color_id != null
+                ) {
+                    val newField = oldField.map {
+                        if (it.user_color_id == targetBox.loss_user_color_id) {
+                            it.copy(color = winner.color, user_color_id = winner.id)
+                        } else it
+                    }
+                    Timber.d("newField: $newField")
+                    field.postValue(newField)
+                } else {
+                    Timber.d("oldField: $oldField")
+                    field.postValue(oldField)
+                }
             }
         }
     }

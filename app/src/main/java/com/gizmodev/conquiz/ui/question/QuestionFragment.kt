@@ -1,6 +1,5 @@
 package com.gizmodev.conquiz.ui.question
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.*
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -26,20 +25,20 @@ class QuestionFragment : AppDialogFragment(), OnVariantClickListener {
     @Inject
     lateinit var vm: QuestionViewModel
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//
+//        if (savedInstanceState != null) return
+//        val question = QuestionFragmentArgs.fromBundle(arguments!!).question
+//        vm.state.setQuestion(question)
+//    }
 
-        if (savedInstanceState != null) return
-        val question = QuestionFragmentArgs.fromBundle(arguments!!).question
-        vm.state.setQuestion(question)
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-
-        return dialog
-    }
+//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+//        val dialog = super.onCreateDialog(savedInstanceState)
+////        dialog.setTitle("Вопрос")
+//        dialog.hide()
+//        return dialog
+//    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
@@ -105,4 +104,5 @@ class QuestionFragment : AppDialogFragment(), OnVariantClickListener {
             return@setOnKeyListener false
         }
     }
+
 }

@@ -34,7 +34,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="8dp">
+            android:padding="16dp">
 
         <ProgressBar
                 app:layout_constraintStart_toStartOf="parent"
@@ -85,10 +85,11 @@
 
             <TextView
                     android:id="@+id/online_users"
-                    android:text="@{`Кто онлайн: ` + state.onlineUsersText}"
+                    android:text="@{`Онлайн: ` + state.onlineUsersText}"
                     android:visibility="@{state.onlineUsersText != null ? View.VISIBLE : View.GONE, default=gone }"
                     tools:visibility="visible"
                     android:gravity="center"
+                    android:textSize="16sp"
                     tools:text="@tools:sample/lorem"
                     app:layout_constraintTop_toBottomOf="@id/game_title"
                     app:layout_constraintStart_toStartOf="parent"
@@ -96,9 +97,23 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"/>
 
+            <TextView
+                    android:id="@+id/game_status"
+                    android:text="@{state.competitiveTitle}"
+                    android:gravity="center"
+                    android:textSize="16sp"
+                    tools:text="@tools:sample/lorem"
+                    android:visibility="@{(state.winner == null) ? View.VISIBLE : View.GONE, default=gone }"
+                    tools:visibility="visible"
+                    app:layout_constraintTop_toBottomOf="@id/online_users"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
             <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/user_colors"
-                    app:layout_constraintTop_toBottomOf="@id/online_users"
+                    app:layout_constraintTop_toBottomOf="@id/game_status"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     android:layout_width="match_parent"
@@ -136,6 +151,7 @@
                     app:layout_constraintTop_toBottomOf="@id/boxes"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>
+
             <TextView
                     android:id="@+id/who_moves"
                     android:layout_width="0dp"
@@ -147,7 +163,7 @@
                     tools:text="Ходит username"
                     android:gravity="center"
                     android:layout_marginTop="8dp"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
                     app:layout_constraintTop_toBottomOf="@id/open_question"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>
@@ -163,7 +179,7 @@
                     tools:text="Победитель username"
                     android:gravity="center"
                     android:layout_marginTop="8dp"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
                     app:layout_constraintTop_toBottomOf="@id/who_moves"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>

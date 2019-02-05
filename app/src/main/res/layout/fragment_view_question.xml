@@ -26,6 +26,8 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="@{state.question != null ? View.VISIBLE : View.GONE, default=gone }"
+            tools:visibility="visible"
             android:padding="8dp">
         <TextView
                 android:id="@+id/question_title"
@@ -37,7 +39,7 @@
                 app:layout_constraintBottom_toTopOf="@id/variants"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="@{state.question.title}"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 tools:text="@string/sample_question"
                 android:gravity="center"/>

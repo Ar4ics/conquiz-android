@@ -37,18 +37,21 @@ class ProfileViewModel(
 //            }
 //        }
         state.setSigningIn()
-        loadPusher()
         Observable.defer {
             val token = sharedPrefStorage.readToken()
             Observable.just(token)
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doAfterTerminate {
+                loadPusher()
+            }
             .subscribe(
                 { result ->
                     Timber.d("Token loaded: $result")
                     if (result != null && result.isNotBlank()) {
-                        authenticate(result)
+                        authenticationInterceptor.token = result
+                        authenticate()
                     } else {
                         state.setSignedOut(Throwable("token not found in shared prefs"))
                     }
@@ -61,7 +64,7 @@ class ProfileViewModel(
             .untilCleared()
     }
 
-    private fun authenticate(token: String) {
+    private fun authenticate() {
 
 //        launch {
 //            try {
@@ -72,7 +75,6 @@ class ProfileViewModel(
 //                onError(e)
 //            }
 //        }
-        authenticationInterceptor.token = token;
         loginApi.getUser()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -86,7 +88,6 @@ class ProfileViewModel(
         Timber.d("success logged in = $userLogin")
         gameHolder.user = userLogin.data
         state.setSignedIn(userLogin)
-        loadPusher()
     }
 
     private fun loadPusher() {
@@ -113,19 +114,26 @@ class ProfileViewModel(
         removeToken()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        pusherHolder.disconnect()
+    }
+
     private fun removeToken() {
         Timber.d("perform remove token")
         Observable.defer {
-            pusherHolder.disconnect()
             val success = sharedPrefStorage.removeToken()
             Observable.just(success)
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnTerminate {
+            .doAfterTerminate {
                 gameHolder.user = null
                 gameHolder.game = null
+                gameHolder.question = null
                 gameHolder.player = null
+                gameHolder.onlineUsers.value = mapOf()
+                authenticationInterceptor.token = null
             }
             .subscribe(
                 { result ->
@@ -153,7 +161,7 @@ class ProfileViewModel(
                 removeToken()
             }
             .subscribe(
-                { _ ->
+                {
                     Timber.d("Success logout")
                 },
                 { error ->

@@ -15,10 +15,9 @@ import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 
-
 class GameListViewModel(
     private val gameApi: GameApi,
-    private val gameHolder: GameHolder,
+    val gameHolder: GameHolder,
     private val pusherHolder: PusherHolder
 ) : AppViewModel() {
 
@@ -38,6 +37,7 @@ class GameListViewModel(
 //            }
 //        }
 
+        loadPusher()
         state.setGamesLoading()
         gameApi.getGames()
             .subscribeOn(Schedulers.io())
@@ -54,6 +54,10 @@ class GameListViewModel(
                 }
             )
             .untilCleared()
+    }
+
+    private fun loadPusher() {
+        pusherHolder.pusher ?: return
 
         state.onlineUsers.postValue(gameHolder.onlineUsers.value[room])
 
@@ -64,11 +68,11 @@ class GameListViewModel(
         }.untilCleared()
 
         pusherHolder.connectPresence(room)
-
     }
 
     override fun onCleared() {
         super.onCleared()
+        pusherHolder.pusher ?: return
         pusherHolder.disconnectPresence(room)
     }
 
@@ -129,7 +133,7 @@ class GameListViewModel(
 
         val onlineUsers = MutableLiveData<List<com.gizmodev.conquiz.model.User>?>()
         val onlineUsersCount = Transformations.map(onlineUsers) { list ->
-            list?.count() ?: 0
+            list?.count()
         }
     }
 }

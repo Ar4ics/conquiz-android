@@ -59,6 +59,7 @@ class PusherHolder(
     }
 
     fun connectPresence(gameId: Int) {
+        gameHolder.user ?: return
         val channel = pusher?.getPresenceChannel("presence-users.$gameId")
         if (channel != null && channel.isSubscribed) return
         pusher?.subscribePresence("presence-users.$gameId", object : PresenceChannelEventListener {
@@ -114,11 +115,11 @@ class PusherHolder(
                     gameHolder.onlineUsers.value = gameHolder.onlineUsers.value.plus(gameId to oldUsers)
                 }
             }
-
         })
     }
 
     fun disconnectPresence(gameId: Int) {
+        gameHolder.user ?: return
         pusher?.unsubscribe("presence-users.$gameId")
     }
 

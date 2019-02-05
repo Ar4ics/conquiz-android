@@ -70,7 +70,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/create_game"
+                    app:layout_constraintBottom_toTopOf="@id/create_game_btn"
                     android:text="@{state.user.data.name}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -95,7 +95,7 @@
                     android:id="@+id/sign_out"
                     android:text="@string/sign_out"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/create_game"
+                    app:layout_constraintTop_toBottomOf="@id/create_game_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
         </androidx.constraintlayout.widget.ConstraintLayout>

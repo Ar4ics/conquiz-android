@@ -24,9 +24,9 @@ class App : MultiDexApplication(), HasSupportFragmentInjector {
     override fun onCreate() {
         super.onCreate()
         if (LeakCanary.isInAnalyzerProcess(this)) {
-            return;
+            return
         }
-        LeakCanary.install(this);
+        LeakCanary.install(this)
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
                 StrictMode.ThreadPolicy.Builder()

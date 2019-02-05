@@ -3,6 +3,7 @@ package com.gizmodev.conquiz.network
 import com.gizmodev.conquiz.model.GameDetails
 import com.gizmodev.conquiz.model.GameMessageGroup
 import com.gizmodev.conquiz.model.GamesInfo
+import com.gizmodev.conquiz.model.User
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -11,6 +12,9 @@ import retrofit2.http.*
 interface GameApi {
     @GET("games")
     fun getGames(): Single<GamesInfo>
+
+    @GET("users")
+    fun getUsers(): Single<List<User>>
 
     @GET("games/{id}")
     fun getGame(@Path(value = "id", encoded = true) id: Int): Single<GameDetails>

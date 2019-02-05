@@ -58,6 +58,7 @@ class GameListFragment : AppFragment(), OnGameClickListener {
     }
 
     override fun onGameClicked(game: Game) {
-        navController().navigate(GameListFragmentDirections.actionListGamesToViewGame(game))
+        vm.gameHolder.game = game
+        navController().navigate(GameListFragmentDirections.actionListGamesToViewGame())
     }
 }

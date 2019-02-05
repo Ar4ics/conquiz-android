@@ -56,7 +56,7 @@
                 android:hint="@string/game_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName"
+                android:inputType="text"
                 android:text="@={state.gameTitle}"
                 android:singleLine="true"
                 android:ems="12"
@@ -69,7 +69,7 @@
 
         <EditText
                 android:text='@={state.countX}'
-                android:hint="Длина поля (от 3 до 12)"
+                android:hint="Длина поля (от 2 до 5)"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
@@ -83,7 +83,7 @@
                 tools:ignore="Autofill"/>
         <EditText
                 android:text='@={state.countY}'
-                android:hint="Ширина поля (от 3 до 12)"
+                android:hint="Ширина поля (от 2 до 5)"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
@@ -108,11 +108,12 @@
 
         <androidx.recyclerview.widget.RecyclerView
                 app:itemBinding="@{usersbinding}"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
                 app:items="@{state.users}"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_margin="8dp"
                 android:id="@+id/users_rv"
                 app:layout_constraintTop_toBottomOf="@+id/help_text"
                 app:layout_constraintStart_toStartOf="parent"
@@ -123,9 +124,8 @@
                 android:onClick="@{() -> listener.createGame()}"
                 android:text="@string/create_game"
                 android:layout_width="wrap_content"
-                android:layout_height="47dp"
+                android:layout_height="wrap_content"
                 android:id="@+id/createGame"
-                android:layout_marginBottom="32dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"

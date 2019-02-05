@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp">
         <TextView
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:padding="8dp"
                 android:id="@+id/username"
                 app:layout_constraintTop_toTopOf="parent"
@@ -31,7 +31,7 @@
         <TextView
                 android:padding="8dp"
                 android:id="@+id/place"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/username"
@@ -44,7 +44,7 @@
         <TextView
                 android:padding="8dp"
                 android:id="@+id/score"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 app:layout_constraintStart_toEndOf="@id/place"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"

@@ -22,22 +22,15 @@ class CreateGameViewModel(
 
     init {
 
-        gameHolder.onlineUsers.observable.subscribe {
-            Timber.d("online users: $it")
-            val users = it[room]
-            state.setOnlineUsers(users)
-        }.untilCleared()
-
-        pusherHolder.connectPresence(0)
-
+        loadPusher()
         state.setUsersLoading()
-        gameApi.getGames()
+        gameApi.getUsers()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { result ->
-                    Timber.d("Users loaded: ${result.users}")
-                    state.setUsers(result.users)
+                    Timber.d("Users loaded: $result")
+                    state.setUsers(result.filter { it.id != gameHolder.user?.id})
                     val ou = gameHolder.onlineUsers.value[room]
                     Timber.d("online users: $ou")
                     state.setOnlineUsers(ou)
@@ -50,13 +43,26 @@ class CreateGameViewModel(
             .untilCleared()
     }
 
+    private fun loadPusher() {
+        pusherHolder.pusher ?: return
+
+        gameHolder.onlineUsers.observable.subscribe {
+            Timber.d("online users: $it")
+            val users = it[room]
+            state.setOnlineUsers(users)
+        }.untilCleared()
+
+        pusherHolder.connectPresence(room)
+    }
+
     override fun onCleared() {
         super.onCleared()
+        pusherHolder.pusher ?: return
         pusherHolder.disconnectPresence(0)
     }
 
-
     fun createGame(title: String, countX: Int, countY: Int, users: List<Int>) {
+        gameHolder.user ?: return
         gameApi.createGame(title, countX, countY, users)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
